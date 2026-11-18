@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Змейки и Лестницы</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; height: 100dvh; user-select: none; transition: background .4s, color .4s; }
+  body[data-theme="dark"] { --bg: linear-gradient(135deg,#0f0c29,#1a1a2e 40%,#16213e 70%,#0f0c29); --text:#fff; --panel:rgba(255,255,255,.08); --panel-strong:rgba(255,255,255,.14); --cell-bg:linear-gradient(135deg,#2d2d44,#1e1e30); --border:#444; --dim:rgba(255,255,255,.55); }
+  body[data-theme="light"] { --bg: linear-gradient(135deg,#e0e7ff,#f0f9ff,#e0e7ff); --text:#1a1a2e; --panel:rgba(0,0,0,.06); --panel-strong:rgba(0,0,0,.12); --cell-bg:linear-gradient(135deg,#cbd5e1,#b8c4d4); --border:#94a3b8; --dim:rgba(0,0,0,.55); }
+  body[data-theme="space"] { --bg: linear-gradient(135deg,#0f0a2e,#2d1b69 50%,#1a1a2e); --text:#e0e7ff; --panel:rgba(139,92,246,.15); --panel-strong:rgba(139,92,246,.25); --cell-bg:linear-gradient(135deg,#2e1b69,#1e1b4b); --border:#4c1d95; --dim:rgba(224,231,255,.6); }
+  body[data-theme="jungle"] { --bg: linear-gradient(135deg,#064e3b,#14532d,#0f172a); --text:#d1fae5; --panel:rgba(34,197,94,.12); --panel-strong:rgba(34,197,94,.22); --cell-bg:linear-gradient(135deg,#1e5a3b,#1e3a2b); --border:#065f46; --dim:rgba(209,250,229,.6); }
+  .screen { position: fixed; inset: 0; display: flex; flex-direction: column; overflow-y: auto; }
+  .screen.hidden { display: none; }
+  button { cursor: pointer; font-family: inherit; border: none; color: inherit; }
+  .settings-content { padding: 16px; max-width: 520px; margin: 0 auto; width: 100%; }
+  .settings-title { font-size: 26px; font-weight: 800; text-align: center; margin: 10px 0 18px; background: linear-gradient(135deg,#667eea,#a855f7,#4ea8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; cursor: pointer; user-select: none; }
+  .settings-section { background: var(--panel); border-radius: 16px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,.15); }
+  .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; opacity: .65; font-weight: 700; margin-bottom: 10px; }
+  .row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; gap: 10px; font-size: 14px; }
+  .row + .row { border-top: 1px solid var(--panel); }
+  .row label { flex: 1; }
+  .row input[type="text"], .row input[type="number"] { background: var(--panel-strong); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 8px; font-size: 14px; width: 130px; text-align: right; }
+  .row select { background: var(--panel-strong); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 8px; font-size: 14px; }
+  .toggle-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .toggle-btn { background: var(--panel-strong); color: var(--text); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; border: 1px solid transparent; opacity: .65; transition: all .15s; }
+  .toggle-btn.active { background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; opacity: 1; box-shadow: 0 2px 10px rgba(102,126,234,.4); }
+  .toggle-btn[data-diff="easy"].active { background: linear-gradient(135deg,#22c55e,#16a34a)!important; }
+  .toggle-btn[data-diff="normal"].active { background: linear-gradient(135deg,#4ea8ff,#2563eb)!important; }
+  .toggle-btn[data-diff="hard"].active { background: linear-gradient(135deg,#f97316,#ea580c)!important; }
+  .toggle-btn[data-diff="nightmare"].active { background: linear-gradient(135deg,#a855f7,#dc2626)!important; }
+  #difficultySection { display: none; }
+  #adminSection { display: none; border-color: #f59e0b; }
+  .diff-desc { font-size: 12px; opacity: .75; margin-top: 8px; text-align: center; line-height: 1.4; padding: 8px; border-radius: 8px; background: var(--panel-strong); }
+  .big-btn { background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; font-size: 17px; font-weight: bold; padding: 16px; border-radius: 14px; width: 100%; margin-top: 8px; box-shadow: 0 6px 24px rgba(102,126,234,.5), inset 0 1px 0 rgba(255,255,255,.25); transition: transform .1s; position: relative; overflow: hidden; }
+  .big-btn::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(180deg, rgba(255,255,255,.15), transparent); pointer-events: none; }
+  .big-btn:active { transform: scale(.97); }
+  .big-btn.secondary { background: var(--panel-strong); box-shadow: none; font-size: 14px; padding: 12px; margin-top: 8px; }
+  .big-btn.secondary::before { display: none; }
+  .big-btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
+  .big-btn.continue-active { background: linear-gradient(135deg,#22c55e,#16a34a)!important; box-shadow: 0 6px 24px rgba(34,197,94,.5), inset 0 1px 0 rgba(255,255,255,.25)!important; font-size: 16px; }
+  .big-btn.admin-btn-style { background: linear-gradient(135deg,#f59e0b,#d97706)!important; box-shadow: 0 6px 24px rgba(245,158,11,.5), inset 0 1px 0 rgba(255,255,255,.25)!important; }
+  .dice-chances { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 10px; }
+  .chance-item { background: var(--panel-strong); border-radius: 10px; padding: 8px; text-align: center; }
+  .chance-face { font-size: 22px; margin-bottom: 2px; }
+  .chance-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 4px 6px; border-radius: 6px; font-size: 14px; text-align: center; font-weight: bold; }
+  .chance-input.invalid { border-color: #ff6b6b; }
+  .chance-pct { font-size: 10px; opacity: .6; margin-top: 2px; }
+  .chance-sum { text-align: center; font-size: 13px; font-weight: bold; padding: 6px; border-radius: 8px; margin-bottom: 8px; background: rgba(34,197,94,.15); color: #22c55e; }
+  .chance-sum.invalid { background: rgba(255,107,107,.15); color: #ff6b6b; }
+  .presets { display: flex; gap: 6px; flex-wrap: wrap; }
+  .presets button { flex: 1; min-width: 80px; background: var(--panel-strong); color: var(--text); padding: 8px 6px; border-radius: 8px; font-size: 11px; font-weight: 600; }
+  .score-bar { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 10px 44px 8px 8px; flex-wrap: wrap; background: rgba(0,0,0,.2); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,.06); }
+  .score-side { padding: 6px 12px; border-radius: 20px; background: rgba(0,0,0,.3); display: flex; align-items: center; gap: 6px; font-size: 12px; transition: all .3s; border: 1px solid rgba(255,255,255,.06); }
+  .score-side.active { box-shadow: 0 0 20px currentColor, inset 0 0 10px currentColor; }
+  .score-side.p1 { color: #ff6b6b; }
+  .score-side.p2 { color: #4ea8ff; }
+  .score-side.p3 { color: #a855f7; }
+  .score-side.p4 { color: #ec4899; }
+  .score-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70px; color: var(--text); font-weight: 600; }
+  .score-num { font-size: 18px; font-weight: 900; color: var(--text); }
+  .score-colon { font-size: 16px; opacity: .5; font-weight: bold; }
+  .board-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px; min-height: 0; }
+  .board { display: grid; grid-template-columns: repeat(10,1fr); grid-template-rows: repeat(10,1fr); gap: 2px; padding: 5px; background: linear-gradient(135deg,#0a0a15,#151525); border: 2px solid transparent; background-clip: padding-box; border-radius: 14px; overflow: visible; width: min(100%, calc(100dvh - 320px)); aspect-ratio: 1; position: relative; box-shadow: 0 0 0 2px rgba(102,126,234,.4), 0 0 0 4px rgba(102,126,234,.15), 0 12px 45px rgba(0,0,0,.6), inset 0 0 40px rgba(102,126,234,.12); }
+  .overlay-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; border-radius: 12px; }
+  .cell { background: var(--cell-bg); position: relative; padding: 2px; border-radius: 5px; transition: all .2s; box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 2px rgba(0,0,0,.3); overflow: visible; }
+  .cell.red { background: linear-gradient(135deg,#8a2020,#5a1010); }
+  .cell.green { background: linear-gradient(135deg,#1f6a2e,#0f4519); }
+  .cell.yellow { background: linear-gradient(135deg,#d4a82c,#a07d0f); }
+  .cell.finish { background: linear-gradient(135deg,#ffd93d,#f39c12,#e74c3c); box-shadow: 0 0 20px rgba(243,156,18,.7), inset 0 0 12px rgba(255,255,255,.5); animation: finish-glow 2s infinite; }
+  @keyframes finish-glow { 0%,100% { box-shadow: 0 0 15px rgba(243,156,18,.5), inset 0 0 10px rgba(255,255,255,.3); } 50% { box-shadow: 0 0 28px rgba(243,156,18,.9), inset 0 0 16px rgba(255,255,255,.6); } }
+  .cell.flash { animation: cell-flash .4s ease; }
+  @keyframes cell-flash { 50% { box-shadow: inset 0 0 0 4px #fff, inset 0 0 20px rgba(255,255,255,.9); } }
+  .cell .num { font-size: 8px; font-weight: 700; color: rgba(255,255,255,.5); text-shadow: 0 1px 2px rgba(0,0,0,.9); position: relative; z-index: 2; }
+  .cell .delta { position: absolute; bottom: 1px; right: 2px; font-size: 8px; font-weight: 800; color: rgba(255,255,255,.95); text-shadow: 0 1px 3px rgba(0,0,0,.9); z-index: 2; }
+  .token { position: absolute; width: 60%; height: 60%; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.95); box-shadow: 0 3px 8px rgba(0,0,0,.7), inset 0 -3px 6px rgba(0,0,0,.35), inset 0 3px 6px rgba(255,255,255,.35); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.8); top: 20%; left: 20%; z-index: 20; transition: top .15s, left .15s, right .15s, bottom .15s; }
+  .token.p1 { background: radial-gradient(circle at 30% 30%, #ffa8a8, #ff6b6b 45%, #c92a2a); }
+  .token.p2 { background: radial-gradient(circle at 30% 30%, #8ac4ff, #4ea8ff 45%, #2563eb); }
+  .token.p3 { background: radial-gradient(circle at 30% 30%, #d0a8ff, #a855f7 45%, #7c3aed); }
+  .token.p4 { background: radial-gradient(circle at 30% 30%, #ffa8d0, #ec4899 45%, #be185d); }
+  .token.active { animation: token-pulse 1.8s infinite; }
+  @keyframes token-pulse { 0%,100% { box-shadow: 0 3px 8px rgba(0,0,0,.7), inset 0 -3px 6px rgba(0,0,0,.35), inset 0 3px 6px rgba(255,255,255,.35), 0 0 0 0 currentColor; } 50% { box-shadow: 0 3px 8px rgba(0,0,0,.7), inset 0 -3px 6px rgba(0,0,0,.35), inset 0 3px 6px rgba(255,255,255,.35), 0 0 0 8px transparent; } }
+  .token.multi { width: 42%; height: 42%; font-size: 8px; }
+  .token.multi.pos-1 { top: 3%; left: 3%; }
+  .token.multi.pos-2 { top: 3%; right: 3%; left: auto; }
+  .token.multi.pos-3 { bottom: 3%; top: auto; left: 3%; }
+  .token.multi.pos-4 { bottom: 3%; top: auto; right: 3%; left: auto; }
+  .token-label { position: absolute; top: -115%; left: 50%; transform: translateX(-50%); font-size: 7px; font-weight: 800; color: #fff; padding: 2px 5px; border-radius: 5px; white-space: nowrap; z-index: 30; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,.9); box-shadow: 0 2px 8px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.25); max-width: 80px; overflow: hidden; text-overflow: ellipsis; border: 1px solid rgba(255,255,255,.4); line-height: 1; }
+  .token-label.p1 { background: linear-gradient(135deg,#c92a2a,#7a1c1c); }
+  .token-label.p2 { background: linear-gradient(135deg,#2563eb,#1e40af); }
+  .token-label.p3 { background: linear-gradient(135deg,#7c3aed,#5b21b6); }
+  .token-label.p4 { background: linear-gradient(135deg,#be185d,#831843); }
+  .controls { padding: 6px 10px 8px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .msg { font-size: 13px; min-height: 18px; text-align: center; font-weight: 600; }
+  .dice-row { display: flex; align-items: center; gap: 12px; }
+  .dice-3d { font-size: 40px; width: 55px; height: 50px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 4px 8px rgba(0,0,0,.5)); }
+  .dice-3d.rolling { animation: dice-spin .6s ease; }
+  @keyframes dice-spin { 0% { transform: rotate(0) scale(1); } 30% { transform: rotate(180deg) scale(1.4) rotateX(180deg); } 60% { transform: rotate(360deg) scale(1.2) rotateX(360deg); } 100% { transform: rotate(720deg) scale(1) rotateX(720deg); } }
+  .timer-display { font-size: 22px; font-weight: 900; min-width: 32px; text-align: center; color: var(--text); }
+  .timer-display.urgent { color: #ff6b6b; animation: pulse .5s infinite; }
+  @keyframes pulse { 50% { opacity: .5; transform: scale(1.15); } }
+  .buttons-row { display: flex; gap: 8px; width: 100%; max-width: 360px; }
+  .dice-btn { flex: 1; color: #fff; font-size: 13px; font-weight: 800; padding: 14px 6px; border-radius: 14px; transition: all .15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; border: 1px solid rgba(255,255,255,.2); text-shadow: 0 1px 2px rgba(0,0,0,.5); }
+  .dice-btn::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(180deg, rgba(255,255,255,.25), transparent); pointer-events: none; }
+  .dice-btn.p1 { background: linear-gradient(135deg,#ff6b6b,#c92a2a); }
+  .dice-btn.p2 { background: linear-gradient(135deg,#4ea8ff,#2563eb); }
+  .dice-btn.p3 { background: linear-gradient(135deg,#a855f7,#7c3aed); }
+  .dice-btn.p4 { background: linear-gradient(135deg,#ec4899,#be185d); }
+  .dice-btn:not(:disabled) { box-shadow: 0 4px 15px rgba(0,0,0,.4), 0 0 0 2px currentColor; }
+  .dice-btn:active:not(:disabled) { transform: scale(.94) translateY(2px); }
+  .dice-btn:disabled { opacity: .3; box-shadow: none; }
+  .small-btns { display: flex; gap: 8px; justify-content: center; margin-top: 2px; }
+  .small-btns button { background: transparent; border: 1px solid var(--border); color: var(--dim); padding: 5px 14px; border-radius: 20px; font-size: 11px; }
+  .history-wrap { padding: 6px 10px calc(8px + env(safe-area-inset-bottom)); background: rgba(0,0,0,.35); backdrop-filter: blur(12px); border-top: 1px solid rgba(255,255,255,.06); }
+  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .history-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: .55; font-weight: 800; }
+  .history-list { height: 46px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; font-size: 11px; }
+  .history-item { padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,.04); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+  .history-item.p1 { border-left: 3px solid #ff6b6b; }
+  .history-item.p2 { border-left: 3px solid #4ea8ff; }
+  .history-item.p3 { border-left: 3px solid #a855f7; }
+  .history-item.p4 { border-left: 3px solid #ec4899; }
+  .history-item.round { text-align: center; color: #ffd93d; background: rgba(255,217,61,.12); font-weight: bold; border-left: none; }
+  .admin-floating-btn { position: fixed; top: calc(6px + env(safe-area-inset-top)); right: 8px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,.4); border: 1px solid var(--border); color: var(--text); font-size: 15px; z-index: 150; display: none; align-items: center; justify-content: center; opacity: .5; transition: all .2s; padding: 0; backdrop-filter: blur(8px); }
+  .admin-floating-btn:hover, .admin-floating-btn:active { opacity: 1; transform: scale(1.1); }
+  .diff-badge { position: fixed; top: calc(6px + env(safe-area-inset-top)); left: 8px; padding: 6px 14px; border-radius: 18px; background: rgba(0,0,0,.5); border: 1px solid var(--border); font-size: 11px; font-weight: 800; z-index: 150; display: none; backdrop-filter: blur(8px); }
+  .win-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(14px); display: flex; align-items: center; justify-content: center; z-index: 500; padding: 16px; overflow-y: auto; }
+  .win-card { background: var(--bg); border: 2px solid transparent; background-clip: padding-box; border-radius: 24px; padding: 22px; max-width: 440px; width: 100%; text-align: center; max-height: 90vh; overflow-y: auto; box-shadow: 0 0 0 2px rgba(102,126,234,.5), 0 20px 60px rgba(0,0,0,.7); }
+  .win-trophy { font-size: 60px; margin-bottom: 6px; filter: drop-shadow(0 4px 12px rgba(255,217,61,.5)); animation: trophy-bounce 1s ease; }
+  @keyframes trophy-bounce { 0% { transform: scale(0) rotate(-180deg); } 60% { transform: scale(1.2) rotate(20deg); } 100% { transform: scale(1) rotate(0deg); } }
+  .win-image-wrap { margin: 8px 0 12px; text-align: center; }
+  .win-image { max-width: 100%; max-height: 200px; border-radius: 12px; border: 2px solid var(--border); box-shadow: 0 6px 24px rgba(0,0,0,.5); }
+  .win-image-controls { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
+  .small-btn { background: var(--panel-strong); color: var(--text); padding: 6px 14px; border-radius: 16px; font-size: 11px; }
+  .win-title { font-size: 24px; font-weight: 900; margin-bottom: 4px; background: linear-gradient(135deg,#ffd93d,#f39c12); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .win-score { font-size: 15px; opacity: .7; margin-bottom: 16px; font-weight: 600; }
+  .win-stats { background: var(--panel); border-radius: 12px; padding: 12px; margin-bottom: 14px; text-align: left; font-size: 12px; }
+  .stat-row { display: flex; justify-content: space-between; padding: 6px 0; gap: 8px; border-bottom: 1px solid var(--panel-strong); }
+  .stat-row:last-child { border-bottom: none; }
+  .win-new-ach { background: rgba(255,217,61,.15); border: 1px solid rgba(255,217,61,.4); border-radius: 10px; padding: 10px; margin-bottom: 12px; font-size: 13px; color: #ffd93d; font-weight: 700; }
+  .win-btns { display: flex; flex-direction: column; gap: 8px; }
+  .confetti { position: fixed; top: -20px; width: 10px; height: 10px; z-index: 1000; animation: confetti-fall 3s linear forwards; pointer-events: none; border-radius: 2px; box-shadow: 0 0 6px currentColor; }
+  @keyframes confetti-fall { to { transform: translateY(110vh) rotate(720deg); } }
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 600; padding: 20px; }
+  .modal-card { background: var(--bg); border: 2px solid var(--border); border-radius: 18px; padding: 20px; max-width: 460px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+  .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 12px; text-align: center; }
+  .modal-card button.close { width: 100%; background: var(--panel-strong); color: var(--text); padding: 12px; border-radius: 12px; font-size: 14px; margin-top: 12px; font-weight: 600; }
+  .record-row, .ach-row { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; background: var(--panel); margin-bottom: 6px; font-size: 13px; }
+  .ach-row.locked { opacity: .4; }
+  .ach-icon { font-size: 24px; }
+  .ach-name { font-weight: bold; }
+  .ach-desc { font-size: 11px; opacity: .7; }
+  .admin-note { font-size: 11px; opacity: .7; text-align: center; margin-bottom: 12px; line-height: 1.4; }
+  .toast-msg { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); color: #fff; padding: 14px 22px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 99999; box-shadow: 0 8px 32px rgba(0,0,0,.5); max-width: 90vw; text-align: center; transition: opacity .4s; }
+  .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+  .confirm-card { background: linear-gradient(135deg,#1a1a2e,#16213e); border: 2px solid #667eea; border-radius: 16px; padding: 22px; max-width: 380px; width: 100%; text-align: center; color: #fff; box-shadow: 0 20px 60px rgba(0,0,0,.7); }
+  .confirm-msg { font-size: 15px; margin-bottom: 18px; line-height: 1.5; white-space: pre-wrap; }
+  .confirm-btns { display: flex; gap: 10px; }
+  .confirm-no { flex: 1; background: rgba(255,255,255,.14); color: #fff; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; }
+  .confirm-yes { flex: 1; background: linear-gradient(135deg,#22c55e,#16a34a); color: #fff; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; }
+  .admin-unlock-banner { background: linear-gradient(135deg,#f59e0b,#d97706); border: 3px solid #fbbf24; border-radius: 16px; padding: 20px; margin-bottom: 12px; text-align: center; box-shadow: 0 8px 32px rgba(245,158,11,.6); animation: banner-pulse 2s infinite; }
+  @keyframes banner-pulse { 0%,100% { box-shadow: 0 8px 32px rgba(245,158,11,.6); } 50% { box-shadow: 0 8px 48px rgba(245,158,11,1); } }
+  .admin-unlock-icon { font-size: 44px; margin-bottom: 6px; }
+  .admin-unlock-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 14px; letter-spacing: 1px; text-shadow: 0 2px 6px rgba(0,0,0,.3); }
+  .admin-player-row { display: flex; flex-direction: column; gap: 6px; padding: 10px; background: var(--panel-strong); border-radius: 10px; margin-bottom: 8px; font-size: 13px; }
+  .admin-player-info { font-weight: 600; margin-bottom: 4px; }
+  .admin-controls { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .admin-controls select, .admin-controls input[type="number"] { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 6px 8px; border-radius: 6px; font-size: 12px; }
+  .admin-controls input[type="number"] { width: 60px; text-align: center; }
+  .admin-controls button { background: var(--panel-strong); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .admin-big-action { background: linear-gradient(135deg,#f59e0b,#d97706); color: #fff; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; width: 100%; margin-top: 8px; }
+</style>
+</head>
+<body data-theme="dark">
+
+<div id="settingsScreen" class="screen">
+  <div class="settings-content">
+    <div class="settings-title" id="settingsTitle">🎲 Змейки и Лестницы</div>
+
+    <div id="adminUnlockBanner" class="admin-unlock-banner" style="display:none">
+      <div class="admin-unlock-icon">🔓</div>
+      <div class="admin-unlock-title">АДМИН-ПАНЕЛЬ ДОСТУПНА</div>
+      <button id="activateAdminBtn" class="big-btn admin-btn-style">🎯 Использовать админ-панель</button>
+    </div>
+
+    <button class="big-btn secondary" id="continueBtn" disabled>⏯ Нет сохранённого матча</button>
+    <button class="big-btn" id="startBtn">▶ Начать новый матч</button>
+
+    <div class="settings-section" style="margin-top:12px">
+      <div class="section-title">Игроки</div>
+      <div class="row"><label>Сколько игроков?</label><div class="toggle-row"><button class="toggle-btn" data-pc="2">2</button><button class="toggle-btn" data-pc="3">3</button><button class="toggle-btn" data-pc="4">4</button></div></div>
+      <div class="row" id="nameRow1"><label>🔴 Игрок 1</label><input type="text" id="name1" value="Игрок 1" maxlength="12"></div>
+      <div class="row" id="nameRow2"><label>🔵 Игрок 2</label><input type="text" id="name2" value="Игрок 2" maxlength="12"></div>
+      <div class="row" id="nameRow3" style="display:none"><label>🟣 Игрок 3</label><input type="text" id="name3" value="Игрок 3" maxlength="12"></div>
+      <div class="row" id="nameRow4" style="display:none"><label>🟠 Игрок 4</label><input type="text" id="name4" value="Игрок 4" maxlength="12"></div>
+      <div class="row" id="vsAIRow"><label>🤖 Игрок 2 — компьютер</label><div class="toggle-row"><button class="toggle-btn" id="vsAIYes">Да</button><button class="toggle-btn active" id="vsAINo">Нет</button></div></div>
+    </div>
+
+    <div class="settings-section" id="difficultySection">
+      <div class="section-title">🤖 Сложность ИИ</div>
+      <div class="row" style="flex-direction:column;align-items:stretch">
+        <div class="toggle-row" style="justify-content:center;margin-bottom:8px">
+          <button class="toggle-btn" data-diff="easy">😊 Легко</button>
+          <button class="toggle-btn active" data-diff="normal">😐 Норма</button>
+          <button class="toggle-btn" data-diff="hard">😠 Сложно</button>
+          <button class="toggle-btn" data-diff="nightmare">💀 Хард</button>
+        </div>
+        <div class="diff-desc" id="diffDesc"></div>
+      </div>
+    </div>
+
+    <div class="settings-section" id="adminSection">
+      <div class="section-title">🔧 Админ-панель (активна)</div>
+      <div class="row" style="flex-direction:column;align-items:stretch;gap:8px">
+        <button class="big-btn admin-btn-style" id="openAdminBtn">🔧 Открыть админ-панель</button>
+        <button class="big-btn secondary" id="closeAdminBtn">🚫 Отключить админку</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="section-title">🎲 Шансы на кубике (для тебя)</div>
+      <div class="dice-chances" id="diceChances"></div>
+      <div class="chance-sum" id="chanceSum">Сумма: 100%</div>
+      <div class="presets">
+        <button data-preset="equal">Равные</button>
+        <button data-preset="high">Больше — реже</button>
+        <button data-preset="low">Меньше — реже</button>
+        <button data-preset="normalize">Нормализовать</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="section-title">Настройки</div>
+      <div class="row"><label>🎨 Тема</label><select id="themeSelect"><option value="dark">Тёмная</option><option value="light">Светлая</option><option value="space">Космос</option><option value="jungle">Джунгли</option></select></div>
+      <div class="row"><label>🔊 Звуки</label><div class="toggle-row"><button class="toggle-btn active" id="soundOn">Вкл</button><button class="toggle-btn" id="soundOff">Выкл</button></div></div>
+      <div class="row"><label>📳 Вибрация</label><div class="toggle-row"><button class="toggle-btn active" id="vibOn">Вкл</button><button class="toggle-btn" id="vibOff">Выкл</button></div></div>
+      <div class="row"><label>⏱ Таймер на ход (15с)</label><div class="toggle-row"><button class="toggle-btn" id="timerOn">Вкл</button><button class="toggle-btn active" id="timerOff">Выкл</button></div></div>
+    </div>
+
+    <button class="big-btn secondary" id="recordsBtn">📈 Рекорды</button>
+    <button class="big-btn secondary" id="achievementsBtn">🏅 Достижения</button>
+
+    <div style="text-align:center;padding:20px 0 4px;">
+      <span id="versionLink" style="font-size:11px;opacity:0.35;cursor:pointer;user-select:none;display:inline-block;padding:6px 12px;">версия 1.0</span>
+    </div>
+  </div>
+</div>
+
+<div id="gameScreen" class="screen hidden">
+  <div class="diff-badge" id="diffBadge"></div>
+  <button class="admin-floating-btn" id="adminBtn" title="Админ">🔧</button>
+  <div class="score-bar" id="scoreBar"></div>
+  <div class="board-wrap">
+    <div class="board" id="board">
+      <svg class="overlay-svg" id="overlaySvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="msg" id="msg">Ход Игрока 1</div>
+    <div class="dice-row"><div class="dice-3d" id="diceDisplay">🎲</div><div class="timer-display" id="timerDisplay" style="display:none">15</div></div>
+    <div class="buttons-row" id="buttonsRow"></div>
+    <div class="small-btns"><button id="restartBtn">↺ Заново</button><button id="settingsBtn">⚙ Настройки</button></div>
+  </div>
+  <div class="history-wrap">
+    <div class="history-header"><span class="history-title">История ходов</span></div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+</div>
+
+<div id="winScreen" class="win-overlay" style="display:none">
+  <div class="win-card">
+    <div class="win-trophy">🏆</div>
+    <div class="win-image-wrap" id="winImageWrap" style="display:none"><img id="winImage" class="win-image" alt="Победа"></div>
+    <div class="win-image-controls"><button class="small-btn" id="uploadWinBtn">📷 Своя картинка</button><button class="small-btn" id="removeWinBtn" style="display:none">🗑 Удалить</button></div>
+    <input type="file" id="winImageInput" accept="image/*" style="display:none">
+    <div class="win-title" id="winTitle">Игрок 1 выиграл!</div>
+    <div class="win-score" id="winScore">3 : 1</div>
+    <div class="win-new-ach" id="winNewAch" style="display:none"></div>
+    <div class="win-stats" id="winStats"></div>
+    <div class="win-btns">
+      <button class="big-btn" id="shareBtn">📤 Поделиться результатом</button>
+      <button class="big-btn secondary" id="newMatchBtn">🎮 Новый матч</button>
+      <button class="big-btn secondary" id="toSettingsBtn">⚙ В настройки</button>
+    </div>
+  </div>
+</div>
+
+<div id="adminModal" class="modal" style="display:none">
+  <div class="modal-card">
+    <div class="modal-title">🔧 Админ-панель</div>
+    <div class="admin-note">Полный контроль: кубик, позиция, счёт каждого игрока.</div>
+    <div id="adminPlayersList"></div>
+    <button class="admin-big-action" id="adminSkipTurnBtn">⏭ Пропустить ход (следующий игрок)</button>
+    <button class="close" onclick="document.getElementById('adminModal').style.display='none'">Закрыть</button>
+  </div>
+</div>
+
+<div id="recordsModal" class="modal" style="display:none">
+  <div class="modal-card"><div class="modal-title">📈 Рекорды</div><div id="recordsList"></div><button class="close" onclick="document.getElementById('recordsModal').style.display='none'">Закрыть</button></div>
+</div>
+
+<div id="achievementsModal" class="modal" style="display:none">
+  <div class="modal-card"><div class="modal-title">🏅 Достижения</div><div id="achievementsList"></div><button class="close" onclick="document.getElementById('achievementsModal').style.display='none'">Закрыть</button></div>
+</div>
+
+<script>
+// ==================== ТОСТЫ И МОДАЛКИ ====================
+function showToast(message, type) {
+  const t = document.createElement('div');
+  t.className = 'toast-msg';
+  t.textContent = message;
+  t.style.background = type === 'success' ? 'linear-gradient(135deg, #22c55e, #16a34a)' : type === 'error' ? 'linear-gradient(135deg, #ef4444, #b91c1c)' : 'linear-gradient(135deg, #667eea, #764ba2)';
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; }, 2400);
+  setTimeout(() => t.remove(), 3000);
+}
+function showModalConfirm(message, onYes) {
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  const card = document.createElement('div');
+  card.className = 'confirm-card';
+  card.innerHTML = '<div class="confirm-msg"></div><div class="confirm-btns"><button class="confirm-no">Отмена</button><button class="confirm-yes">ОК</button></div>';
+  card.querySelector('.confirm-msg').textContent = message;
+  overlay.appendChild(card);
+  card.querySelector('.confirm-no').onclick = () => overlay.remove();
+  card.querySelector('.confirm-yes').onclick = () => { overlay.remove(); onYes(); };
+  document.body.appendChild(overlay);
+}
+
+// ==================== ЗВУК ====================
+let audioCtx = null;
+function getAudioCtx() { if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} } return audioCtx; }
+function playSound(type) {
+  if (!state || !state.settings.sound) return;
+  const ctx = getAudioCtx(); if (!ctx) return;
+  if (ctx.state === 'suspended') ctx.resume();
+  const now = ctx.currentTime;
+  if (type === 'win') {
+    [523, 659, 784, 1047].forEach((f, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0, now + i * 0.12);
+      g.gain.linearRampToValueAtTime(0.08, now + i * 0.12 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.4);
+      o.start(now + i * 0.12); o.stop(now + i * 0.12 + 0.4);
+    });
+    return;
+  }
+  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  switch (type) {
+    case 'dice': osc.type = 'square'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(150, now + 0.15); gain.gain.setValueAtTime(0.06, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15); osc.start(now); osc.stop(now + 0.15); break;
+    case 'step': osc.type = 'sine'; osc.frequency.value = 800; gain.gain.setValueAtTime(0.04, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04); osc.start(now); osc.stop(now + 0.04); break;
+    case 'green': osc.type = 'sine'; osc.frequency.setValueAtTime(500, now); osc.frequency.exponentialRampToValueAtTime(1000, now + 0.2); gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25); osc.start(now); osc.stop(now + 0.25); break;
+    case 'red': osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.3); gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35); osc.start(now); osc.stop(now + 0.35); break;
+    case 'yellow': osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(1200, now + 0.15); osc.frequency.exponentialRampToValueAtTime(200, now + 0.4); gain.gain.setValueAtTime(0.06, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4); osc.start(now); osc.stop(now + 0.4); break;
+    case 'miss': osc.type = 'triangle'; osc.frequency.value = 200; gain.gain.setValueAtTime(0.08, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3); osc.start(now); osc.stop(now + 0.3); break;
+  }
+}
+function vibrate(pattern) { if (!state || !state.settings.vibrate) return; if (navigator.vibrate) navigator.vibrate(pattern); }
+
+// ==================== УТИЛИТЫ ====================
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function cellFor(n) { const rfb = Math.floor((n - 1) / 10), pir = (n - 1) % 10; return { row: 9 - rfb, col: rfb % 2 === 0 ? pir : 9 - pir }; }
+function cellAt(row, col) { const rfb = 9 - row, pir = rfb % 2 === 0 ? col : 9 - col; return rfb * 10 + pir + 1; }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function escapeHTML(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+// ==================== ВЕСА ====================
+const DEFAULT_WEIGHTS = [30, 25, 18, 13, 9, 5];
+const DIFFICULTY_WEIGHTS = { easy: [50, 30, 12, 5, 3, 0], normal: [30, 25, 18, 13, 9, 5], hard: [10, 15, 20, 20, 20, 15], nightmare: [5, 10, 15, 20, 25, 25] };
+const DIFFICULTY_LABELS = { easy: { name: 'Легко', short: '😊 Легко' }, normal: { name: 'Норма', short: '😐 Норма' }, hard: { name: 'Сложно', short: '😠 Сложно' }, nightmare: { name: 'Хард', short: '💀 Хард' } };
+function rollWithWeights(weights) { if (!weights || weights.length !== 6) return 1 + Math.floor(Math.random() * 6); const sum = weights.reduce((a, b) => a + b, 0); if (sum <= 0) return 1 + Math.floor(Math.random() * 6); let r = Math.random() * sum; for (let i = 0; i < 6; i++) { r -= weights[i]; if (r < 0) return i + 1; } return 6; }
+function normalizeWeights(w) { const sum = w.reduce((a, b) => a + b, 0); if (sum <= 0) return DEFAULT_WEIGHTS.slice(); const raw = w.map(v => v * 100 / sum); const floored = raw.map(v => Math.floor(v)); let diff = 100 - floored.reduce((a, b) => a + b, 0); const withFrac = raw.map((v, i) => ({ i, frac: v - floored[i] })); withFrac.sort((a, b) => b.frac - a.frac); for (let k = 0; k < diff; k++) floored[withFrac[k % 6].i]++; return floored; }
+
+// ==================== АДМИН (в памяти!) ====================
+let adminActive = false;
+let adminSecretUnlocked = false;
+let adminCodeEntered = false;
+
+function isAdmin() { return adminActive; }
+function setAdmin(v) {
+  adminActive = v;
+  try { localStorage.setItem('zmeyki_admin', v ? '1' : '0'); } catch {}
+  updateAdminUI();
+}
+function updateAdminUI() {
+  const btn = document.getElementById('adminBtn');
+  if (btn) btn.style.display = adminActive ? 'flex' : 'none';
+  const section = document.getElementById('adminSection');
+  if (section) section.style.display = adminActive ? 'block' : 'none';
+}
+
+// ==================== КОНСТАНТЫ ====================
+const PLAYER_META = [
+  { id: 1, emoji: '🔴', color: '#ff6b6b', cls: 'p1' },
+  { id: 2, emoji: '🔵', color: '#4ea8ff', cls: 'p2' },
+  { id: 3, emoji: '🟣', color: '#a855f7', cls: 'p3' },
+  { id: 4, emoji: '🟠', color: '#ec4899', cls: 'p4' }
+];
+const DICE_FACES = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+const ACHIEVEMENTS = [
+  { id: 'first_win', icon: '🥇', name: 'Первая победа', desc: 'Выиграть матч' },
+  { id: 'lucky', icon: '🍀', name: 'Везунчик', desc: '5 зелёных клеток подряд' },
+  { id: 'unlucky', icon: '💀', name: 'Неудачник', desc: '3 красные клетки подряд' },
+  { id: 'exact_100', icon: '🎯', name: 'Точный', desc: 'Попасть ровно на 100' },
+  { id: 'win_3_0', icon: '🔥', name: 'Разгром', desc: 'Выиграть матч 3:0' },
+  { id: 'sharer', icon: '📤', name: 'Хвастун', desc: 'Поделиться результатом' }
+];
+
+// ==================== STATE ====================
+let state = null;
+function defaultSettings() { return { theme: 'dark', sound: true, vibrate: true, timer: false, playerCount: 2, vsAI: false, difficulty: 'normal', diceWeights: DEFAULT_WEIGHTS.slice() }; }
+function newPlayer(meta, name, isAI) { return { id: meta.id, name: name, emoji: meta.emoji, color: meta.color, cls: meta.cls, pos: 1, score: 0, isAI: !!isAI, stats: { rolls: 0, total: 0, greens: 0, reds: 0, yellows: 0, streakG: 0, streakR: 0, maxStreakG: 0, maxStreakR: 0 } }; }
+function newMatch(settings, names) {
+  const count = settings.playerCount;
+  const players = [];
+  for (let i = 0; i < count; i++) {
+    const meta = PLAYER_META[i];
+    const isAI = settings.vsAI && i === 1 && count === 2;
+    players.push(newPlayer(meta, names[i] || ('Игрок ' + (i + 1)), isAI));
+  }
+  state = {
+    screen: 'game', players: players, playerCount: count,
+    turn: 0, round: 1, rolling: false, gameOver: false, matchOver: false,
+    special: null, history: [],
+    settings: { theme: settings.theme, sound: settings.sound, vibrate: settings.vibrate, timer: settings.timer, vsAI: settings.vsAI, diceWeights: (settings.diceWeights || DEFAULT_WEIGHTS).slice(), difficulty: settings.difficulty || 'normal' },
+    timerData: { timeout: null, remaining: 15 },
+    adminForce: {}, adminMode: 'always', newAchievements: []
+  };
+  state.special = generateSpecialCells();
+  addHistory('▸ Раунд 1 — начинает ' + players[0].name, 'round');
+}
+
+// ==================== ГЕНЕРАЦИЯ ====================
+function generateSpecialCells() {
+  const used = { 1: true, 100: true };
+  const yellows = [], reds = [], greens = [];
+  const pool = [];
+  for (let n = 5; n <= 95; n++) pool.push(n);
+  shuffle(pool);
+  for (let i = 0; i < pool.length && yellows.length < 4; i++) {
+    const from = pool[i];
+    if (used[from]) continue;
+    const fp = cellFor(from);
+    const cand = [];
+    if (fp.row > 0) { const a = cellAt(fp.row - 1, fp.col); if (Math.abs(a - from) <= 10 && a >= 2 && a <= 99 && !used[a]) cand.push(a); }
+    if (fp.row < 9) { const b = cellAt(fp.row + 1, fp.col); if (Math.abs(b - from) <= 10 && b >= 2 && b <= 99 && !used[b]) cand.push(b); }
+    if (cand.length === 0) continue;
+    const to = cand[Math.floor(Math.random() * cand.length)];
+    yellows.push({ from, to });
+    used[from] = used[to] = true;
+  }
+  for (let i = 0; i < pool.length && reds.length < 3; i++) { const n = pool[i]; if (used[n]) continue; reds.push({ cell: n, delta: -(3 + Math.floor(Math.random() * 5)) }); used[n] = true; }
+  for (let i = 0; i < pool.length && greens.length < 3; i++) { const n = pool[i]; if (used[n]) continue; greens.push({ cell: n, delta: 2 + Math.floor(Math.random() * 4) }); used[n] = true; }
+  return { yellows, reds, greens };
+}
+function findYellow(p) { return state.special.yellows.find(y => y.from === p); }
+function findRed(p) { return state.special.reds.find(r => r.cell === p); }
+function findGreen(p) { return state.special.greens.find(g => g.cell === p); }
+
+// ==================== ОТРИСОВКА ====================
+const boardEl = document.getElementById('board');
+const svgEl = document.getElementById('overlaySvg');
+const msgEl = document.getElementById('msg');
+const diceEl = document.getElementById('diceDisplay');
+const buttonsRow = document.getElementById('buttonsRow');
+const historyList = document.getElementById('historyList');
+const scoreBar = document.getElementById('scoreBar');
+const timerDisplay = document.getElementById('timerDisplay');
+
+function buildBoard() {
+  boardEl.querySelectorAll('.cell').forEach(c => c.remove());
+  for (let n = 1; n <= 100; n++) {
+    const p = cellFor(n);
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    const r = findRed(n), g = findGreen(n), y = findYellow(n);
+    let d = '';
+    if (r) { cell.classList.add('red'); d = '<span class="delta">' + r.delta + '</span>'; }
+    else if (g) { cell.classList.add('green'); d = '<span class="delta">+' + g.delta + '</span>'; }
+    else if (y) cell.classList.add('yellow');
+    if (n === 100) cell.classList.add('finish');
+    cell.style.gridRow = (p.row + 1);
+    cell.style.gridColumn = (p.col + 1);
+    cell.dataset.n = n;
+    cell.innerHTML = '<span class="num">' + n + '</span>' + d;
+    boardEl.appendChild(cell);
+  }
+  drawYellowLines();
+}
+function drawYellowLines() {
+  let html = '';
+  state.special.yellows.forEach(y => {
+    const a = cellFor(y.from), b = cellFor(y.to);
+    const x1 = a.col * 10 + 5, y1 = a.row * 10 + 5, x2 = b.col * 10 + 5, y2 = b.row * 10 + 5;
+    html += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="rgba(0,0,0,0.6)" stroke-width="2.4" stroke-linecap="round" opacity="0.6"/>';
+    html += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="url(#yellowGrad)" stroke-width="1.6" stroke-dasharray="2 1.4" stroke-linecap="round" opacity="0.95"/>';
+    html += '<circle cx="' + x1 + '" cy="' + y1 + '" r="1" fill="#ffe066" opacity="0.75"/>';
+    html += '<circle cx="' + x2 + '" cy="' + y2 + '" r="2" fill="#ffe066" opacity="0.95"/>';
+  });
+  svgEl.innerHTML = '<defs><linearGradient id="yellowGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffd93d"/><stop offset="100%" stop-color="#f39c12"/></linearGradient></defs>' + html;
+}
+function getCellEl(n) { return boardEl.querySelector('[data-n="' + n + '"]'); }
+function flashCell(n) { const c = getCellEl(n); if (!c) return; c.classList.add('flash'); setTimeout(() => c.classList.remove('flash'), 400); }
+function placeTokens() {
+  document.querySelectorAll('.token').forEach(t => t.remove());
+  const positions = {};
+  state.players.forEach(p => { if (!positions[p.pos]) positions[p.pos] = []; positions[p.pos].push(p); });
+  for (const pos in positions) {
+    const cell = getCellEl(Number(pos)); if (!cell) continue;
+    const ps = positions[pos];
+    ps.forEach((p, idx) => {
+      const t = document.createElement('div');
+      t.className = 'token ' + p.cls;
+      if (ps.length > 1) t.classList.add('multi', 'pos-' + (idx + 1));
+      if (state.players[state.turn] === p && !state.matchOver && !state.gameOver) t.classList.add('active');
+      t.textContent = p.id;
+      if (ps.length === 1) { const label = document.createElement('div'); label.className = 'token-label ' + p.cls; label.textContent = p.name; t.appendChild(label); }
+      cell.appendChild(t);
+    });
+  }
+}
+
+// ==================== UI ====================
+function updateScores() {
+  let html = '';
+  state.players.forEach((p, i) => {
+    const active = i === state.turn && !state.matchOver;
+    html += '<div class="score-side ' + p.cls + (active ? ' active' : '') + '"><span class="score-name">' + p.emoji + ' ' + escapeHTML(p.name) + '</span><span class="score-num">' + p.score + '</span></div>';
+    if (i < state.playerCount - 1) html += '<div class="score-colon">:</div>';
+  });
+  scoreBar.innerHTML = html;
+}
+function updateButtons() {
+  let html = '';
+  state.players.forEach((p, i) => {
+    const disabled = (state.turn !== i) || state.rolling || state.gameOver || state.matchOver || p.isAI;
+    html += '<button class="dice-btn ' + p.cls + '" data-idx="' + i + '" ' + (disabled ? 'disabled' : '') + '>' + p.emoji + ' ' + escapeHTML(p.name) + '</button>';
+  });
+  buttonsRow.innerHTML = html;
+  buttonsRow.querySelectorAll('.dice-btn').forEach(b => {
+    b.addEventListener('click', () => { const idx = parseInt(b.dataset.idx, 10); getAudioCtx(); doRoll(idx); });
+  });
+}
+function updateDiffBadge() {
+  const badge = document.getElementById('diffBadge');
+  if (!badge) return;
+  if (state && state.settings && state.settings.vsAI && state.settings.difficulty) {
+    const lbl = DIFFICULTY_LABELS[state.settings.difficulty] || DIFFICULTY_LABELS.normal;
+    badge.textContent = '🤖 ' + lbl.short; badge.style.display = 'block';
+  } else badge.style.display = 'none';
+}
+function updateUI() {
+  updateScores(); updateButtons(); updateDiffBadge();
+  if (!state.gameOver && !state.matchOver) msgEl.textContent = 'Ход ' + state.players[state.turn].name;
+  placeTokens();
+}
+function addHistory(text, type) { state.history.push({ text, type }); if (state.history.length > 80) state.history.shift(); renderHistory(); }
+function renderHistory() {
+  let html = '';
+  state.history.forEach(h => { html += '<div class="history-item' + (h.type ? ' ' + h.type : '') + '">' + escapeHTML(h.text) + '</div>'; });
+  historyList.innerHTML = html;
+  historyList.scrollTop = historyList.scrollHeight;
+}
+
+// ==================== АНИМАЦИИ ====================
+async function animateDice(result) {
+  diceEl.classList.add('rolling');
+  for (let i = 0; i < 8; i++) { diceEl.textContent = DICE_FACES[Math.floor(Math.random() * 6)]; await sleep(50); }
+  diceEl.textContent = DICE_FACES[result - 1];
+  diceEl.classList.remove('rolling');
+}
+async function stepMove(player, target) {
+  const step = target > player.pos ? 1 : -1;
+  let safety = 0;
+  while (player.pos !== target && safety < 120) { player.pos += step; placeTokens(); playSound('step'); await sleep(70); safety++; }
+  player.pos = target;
+  placeTokens();
+}
+
+// ==================== ХОД ====================
+async function doRoll(idx) {
+  if (!state || state.rolling || state.gameOver || state.matchOver) return;
+  if (state.turn !== idx) return;
+  if (state.players[idx].isAI) return;
+  await performRoll();
+}
+async function performRoll() {
+  state.rolling = true;
+  clearTimer();
+  updateButtons();
+  playSound('dice');
+  vibrate(30);
+  const player = state.players[state.turn];
+  let roll;
+  if (state.adminForce && state.adminForce[player.id] != null) {
+    roll = state.adminForce[player.id];
+    if (state.adminMode === 'once') delete state.adminForce[player.id];
+  } else {
+    const weightsForRoll = (player.isAI && state.settings.vsAI) ? (DIFFICULTY_WEIGHTS[state.settings.difficulty] || DIFFICULTY_WEIGHTS.normal) : state.settings.diceWeights;
+    roll = rollWithWeights(weightsForRoll);
+  }
+  await animateDice(roll);
+  player.stats.rolls++;
+  player.stats.total += roll;
+  const emoji = player.emoji;
+  const fromPos = player.pos;
+  const newPos = fromPos + roll;
+  if (newPos > 100) {
+    if (player.isAI && state.settings.vsAI && state.settings.difficulty === 'nightmare') {
+      msgEl.textContent = '💀 ' + player.name + ' — форсаж до 100!';
+      addHistory(emoji + ' ' + roll + ' 💀 → 100', player.cls);
+      playSound('green'); vibrate([50,30,50]);
+      await sleep(400);
+      await stepMove(player, 100);
+      await winRound();
+      return;
+    }
+    addHistory(emoji + ' ' + roll + ' — перебор, пропуск', player.cls);
+    msgEl.textContent = 'Нужно ровно на 100. Ход пропущен.';
+    playSound('miss');
+    await sleep(1000);
+    endTurn();
+    return;
+  }
+  await stepMove(player, newPos);
+  msgEl.textContent = 'Выпало ' + roll + ' → ' + player.pos;
+  await sleep(200);
+  let line = emoji + ' ' + roll + ' → ' + player.pos;
+  const y = findYellow(player.pos), r = findRed(player.pos), g = findGreen(player.pos);
+  if (y) {
+    flashCell(player.pos); playSound('yellow'); vibrate(50);
+    msgEl.textContent = '🟡 Лестница! ' + player.pos + ' → ' + y.to;
+    line += ' 🟡 → ' + y.to;
+    player.stats.yellows++;
+    player.stats.streakG = 0; player.stats.streakR = 0;
+    await sleep(400); await stepMove(player, y.to); flashCell(y.to); await sleep(300);
+  } else if (r) {
+    if (player.isAI && state.settings.vsAI && state.settings.difficulty === 'nightmare' && Math.random() < 0.4) {
+      flashCell(player.pos); playSound('green'); vibrate(50);
+      msgEl.textContent = '🔴 Красная — но 💀 ' + player.name + ' игнорирует!';
+      line += ' 🔴💀';
+      await sleep(700);
+    } else {
+      flashCell(player.pos); playSound('red'); vibrate([30,30,30]);
+      const t = Math.max(1, player.pos + r.delta);
+      msgEl.textContent = '🔴 Красная ' + r.delta + ' → ' + t;
+      line += ' 🔴' + r.delta + ' → ' + t;
+      player.stats.reds++; player.stats.streakR++; player.stats.streakG = 0;
+      if (player.stats.streakR > player.stats.maxStreakR) player.stats.maxStreakR = player.stats.streakR;
+      if (player.stats.streakR >= 3) unlockAchievement('unlucky');
+      await sleep(400); await stepMove(player, t); flashCell(t); await sleep(300);
+    }
+  } else if (g) {
+    flashCell(player.pos); playSound('green'); vibrate(50);
+    const t = Math.min(100, player.pos + g.delta);
+    msgEl.textContent = '🟢 Зелёная +' + g.delta + ' → ' + t;
+    line += ' 🟢+' + g.delta + ' → ' + t;
+    player.stats.greens++; player.stats.streakG++; player.stats.streakR = 0;
+    if (player.stats.streakG > player.stats.maxStreakG) player.stats.maxStreakG = player.stats.streakG;
+    if (player.stats.streakG >= 5) unlockAchievement('lucky');
+    await sleep(400); await stepMove(player, t); flashCell(t); await sleep(300);
+  } else { player.stats.streakG = 0; player.stats.streakR = 0; }
+  addHistory(line, player.cls);
+  if (player.pos === 100) { if (roll === 100 - fromPos) unlockAchievement('exact_100'); await winRound(); return; }
+  saveState();
+  endTurn();
+}
+function endTurn() {
+  if (state.gameOver || state.matchOver) { state.rolling = false; updateUI(); return; }
+  state.turn = (state.turn + 1) % state.playerCount;
+  state.rolling = false;
+  updateUI();
+  saveState();
+  const next = state.players[state.turn];
+  if (next.isAI) { setTimeout(() => { if (!state.gameOver && !state.matchOver && state.turn === state.players.indexOf(next)) performRoll(); }, 900); }
+  else if (state.settings.timer) startTimer();
+}
+
+// ==================== ПОБЕДА ====================
+async function winRound() {
+  const player = state.players[state.turn];
+  player.score++;
+  updateScores();
+  playSound('win'); vibrate([100,50,100,50,100]);
+  addHistory('🎉 Раунд ' + state.round + ': ' + player.name + ' выиграл!', 'round');
+  if (player.score >= 3) {
+    state.matchOver = true; state.gameOver = true; state.rolling = false;
+    saveRecords(player);
+    if (player.score === 3 && state.players.every(p => p === player || p.score === 0)) unlockAchievement('win_3_0');
+    unlockAchievement('first_win');
+    clearSaveState();
+    await sleep(400);
+    showWinScreen(player);
+    return;
+  }
+  state.gameOver = true; state.rolling = false;
+  msgEl.textContent = '🎉 ' + player.name + ' выиграл раунд ' + state.round + '!';
+  updateUI();
+  await sleep(1600);
+  state.round++;
+  state.players.forEach(p => { p.pos = 1; p.stats.streakG = 0; p.stats.streakR = 0; });
+  state.turn = (state.round - 1) % state.playerCount;
+  state.rolling = false; state.gameOver = false;
+  diceEl.textContent = '🎲';
+  state.special = generateSpecialCells();
+  buildBoard();
+  addHistory('▸ Раунд ' + state.round + ' — начинает ' + state.players[state.turn].name, 'round');
+  updateUI();
+  saveState();
+  const next = state.players[state.turn];
+  if (next.isAI) setTimeout(() => { if (!state.gameOver && !state.matchOver) performRoll(); }, 900);
+  else if (state.settings.timer) startTimer();
+}
+
+// ==================== ТАЙМЕР ====================
+function startTimer() {
+  clearTimer();
+  if (!state.settings.timer) return;
+  if (state.players[state.turn].isAI) return;
+  if (state.gameOver || state.matchOver) return;
+  state.timerData.remaining = 15;
+  timerDisplay.style.display = 'block';
+  timerDisplay.classList.remove('urgent');
+  timerDisplay.textContent = '15';
+  state.timerData.timeout = setInterval(() => {
+    state.timerData.remaining--;
+    timerDisplay.textContent = state.timerData.remaining;
+    if (state.timerData.remaining <= 5) timerDisplay.classList.add('urgent');
+    if (state.timerData.remaining <= 0) {
+      clearTimer();
+      const p = state.players[state.turn];
+      addHistory(p.emoji + ' ⏱ пропуск', p.cls);
+      msgEl.textContent = '⏱ Время вышло, ход пропущен';
+      playSound('miss');
+      endTurn();
+    }
+  }, 1000);
+}
+function clearTimer() {
+  if (state && state.timerData.timeout) { clearInterval(state.timerData.timeout); state.timerData.timeout = null; }
+  if (timerDisplay) { timerDisplay.style.display = 'none'; timerDisplay.classList.remove('urgent'); }
+}
+
+// ==================== КАРТИНКА ====================
+function getWinImage() { try { return localStorage.getItem('zmeyki_win_image'); } catch { return null; } }
+function saveWinImage(dataUrl) { try { localStorage.setItem('zmeyki_win_image', dataUrl); } catch (e) { showToast('Не удалось сохранить картинку — нет места', 'error'); } }
+function removeWinImage() { try { localStorage.removeItem('zmeyki_win_image'); } catch {} }
+function updateWinImage() {
+  const img = document.getElementById('winImage');
+  const wrap = document.getElementById('winImageWrap');
+  const removeBtn = document.getElementById('removeWinBtn');
+  const data = getWinImage();
+  if (data) { img.src = data; wrap.style.display = 'block'; removeBtn.style.display = 'inline-block'; }
+  else { img.src = ''; wrap.style.display = 'none'; removeBtn.style.display = 'none'; }
+}
+
+// ==================== ЭКРАН ПОБЕДЫ ====================
+function showWinScreen(winner) {
+  state.screen = 'win';
+  document.getElementById('gameScreen').classList.add('hidden');
+  document.getElementById('winScreen').style.display = 'flex';
+  const otherMax = Math.max(...state.players.filter(p => p !== winner).map(p => p.score));
+  document.getElementById('winTitle').textContent = winner.emoji + ' ' + winner.name + ' выиграл!';
+  document.getElementById('winScore').textContent = 'Счёт: ' + winner.score + ' : ' + otherMax;
+  let stats = '';
+  state.players.forEach(p => {
+    const avg = p.stats.rolls > 0 ? (p.stats.total / p.stats.rolls).toFixed(1) : '0';
+    const diffTag = (p.isAI && state.settings.vsAI) ? ' (' + (DIFFICULTY_LABELS[state.settings.difficulty] || DIFFICULTY_LABELS.normal).short + ')' : '';
+    stats += '<div class="stat-row"><span>' + p.emoji + ' ' + escapeHTML(p.name) + diffTag + '</span><span>🎲 ' + p.stats.rolls + ' | ср. ' + avg + '</span></div><div class="stat-row"><span style="opacity:0.6;font-size:11px">🟢 ' + p.stats.greens + ' | 🔴 ' + p.stats.reds + ' | 🟡 ' + p.stats.yellows + '</span></div>';
+  });
+  document.getElementById('winStats').innerHTML = stats;
+  const newAch = state.newAchievements || [];
+  const achEl = document.getElementById('winNewAch');
+  if (newAch.length > 0) {
+    achEl.style.display = 'block';
+    achEl.innerHTML = '🏅 Новые достижения:<br>' + newAch.map(a => ACHIEVEMENTS.find(x => x.id === a)).filter(Boolean).map(a => a.icon + ' ' + a.name).join(', ');
+  } else achEl.style.display = 'none';
+  updateWinImage();
+  launchConfetti();
+}
+function launchConfetti() {
+  const colors = ['#ff6b6b','#4ea8ff','#a855f7','#ec4899','#ffd93d','#4ecdc4'];
+  for (let i = 0; i < 70; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + '%';
+    const col = colors[Math.floor(Math.random() * colors.length)];
+    c.style.background = col; c.style.color = col;
+    c.style.animationDelay = (Math.random() * 1.5) + 's';
+    c.style.animationDuration = (2 + Math.random() * 2) + 's';
+    c.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5500);
+  }
+}
+
+// ==================== ДОСТИЖЕНИЯ, РЕКОРДЫ ====================
+function getAchievements() { try { return JSON.parse(localStorage.getItem('zmeyki_ach') || '{}'); } catch { return {}; } }
+function saveAchievements(a) { try { localStorage.setItem('zmeyki_ach', JSON.stringify(a)); } catch {} }
+function unlockAchievement(id) {
+  const all = getAchievements();
+  if (all[id]) return;
+  all[id] = Date.now();
+  saveAchievements(all);
+  if (!state.newAchievements) state.newAchievements = [];
+  if (!state.newAchievements.includes(id)) state.newAchievements.push(id);
+}
+function getRecords() { try { return JSON.parse(localStorage.getItem('zmeyki_rec') || '{"wins":{},"total":0}'); } catch { return { wins: {}, total: 0 }; } }
+function saveRecords(winner) {
+  const r = getRecords();
+  r.wins[winner.cls] = (r.wins[winner.cls] || 0) + 1;
+  r.total = (r.total || 0) + 1;
+  try { localStorage.setItem('zmeyki_rec', JSON.stringify(r)); } catch {}
+}
+function showRecords() {
+  const r = getRecords();
+  let html = '';
+  PLAYER_META.forEach(m => { const w = r.wins[m.cls] || 0; if (w > 0) html += '<div class="record-row">' + m.emoji + ' Игрок ' + m.id + ' — побед: ' + w + '</div>'; });
+  if (!html) html = '<div style="text-align:center;opacity:0.6;padding:20px">Пока нет завершённых матчей</div>';
+  html += '<div style="margin-top:12px;text-align:center;opacity:0.6;font-size:12px">Всего матчей: ' + (r.total || 0) + '</div>';
+  document.getElementById('recordsList').innerHTML = html;
+  document.getElementById('recordsModal').style.display = 'flex';
+}
+function showAchievements() {
+  const unlocked = getAchievements();
+  let html = '';
+  ACHIEVEMENTS.forEach(a => {
+    const isOn = !!unlocked[a.id];
+    html += '<div class="ach-row ' + (isOn ? '' : 'locked') + '"><div class="ach-icon">' + a.icon + '</div><div><div class="ach-name">' + a.name + '</div><div class="ach-desc">' + a.desc + '</div></div></div>';
+  });
+  document.getElementById('achievementsList').innerHTML = html;
+  document.getElementById('achievementsModal').style.display = 'flex';
+}
+
+// ==================== СОХРАНЕНИЕ ====================
+function saveState() {
+  if (!state || state.matchOver) return;
+  try { const copy = JSON.parse(JSON.stringify(state)); delete copy.timerData; delete copy.newAchievements; copy.rolling = false; localStorage.setItem('zmeyki_state', JSON.stringify(copy)); } catch {}
+}
+function clearSaveState() { try { localStorage.removeItem('zmeyki_state'); } catch {} }
+function loadState() {
+  try {
+    const raw = localStorage.getItem('zmeyki_state');
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (!s || !s.players || s.matchOver) return null;
+    s.timerData = { timeout: null, remaining: 15 };
+    s.newAchievements = [];
+    s.adminForce = s.adminForce || {};
+    s.adminMode = s.adminMode || 'always';
+    s.rolling = false;
+    if (!s.settings.diceWeights || s.settings.diceWeights.length !== 6) s.settings.diceWeights = DEFAULT_WEIGHTS.slice();
+    if (!s.settings.difficulty) s.settings.difficulty = 'normal';
+    return s;
+  } catch { return null; }
+}
+function getSettings() { try { return JSON.parse(localStorage.getItem('zmeyki_set') || '{}'); } catch { return {}; } }
+function saveSettings(s) { try { localStorage.setItem('zmeyki_set', JSON.stringify(s)); } catch {} }
+
+// ==================== НАВИГАЦИЯ ====================
+function showScreen(name) {
+  document.getElementById('settingsScreen').classList.toggle('hidden', name !== 'settings');
+  document.getElementById('gameScreen').classList.toggle('hidden', name !== 'game');
+  document.getElementById('winScreen').style.display = (name === 'win') ? 'flex' : 'none';
+  updateAdminUI();
+}
+function startNewGame(settings, names) {
+  clearSaveState(); clearTimer();
+  newMatch(settings, names);
+  state.newAchievements = [];
+  document.body.dataset.theme = settings.theme;
+  buildBoard();
+  showScreen('game');
+  updateUI();
+  saveState();
+  if (state.players[state.turn].isAI) setTimeout(() => performRoll(), 900);
+  else if (state.settings.timer) startTimer();
+}
+function resumeGame(savedState) {
+  state = savedState;
+  state.newAchievements = [];
+  state.timerData = { timeout: null, remaining: 15 };
+  state.adminForce = state.adminForce || {};
+  state.adminMode = state.adminMode || 'always';
+  if (!state.settings.diceWeights || state.settings.diceWeights.length !== 6) state.settings.diceWeights = DEFAULT_WEIGHTS.slice();
+  if (!state.settings.difficulty) state.settings.difficulty = 'normal';
+  document.body.dataset.theme = state.settings.theme;
+  buildBoard();
+  renderHistory();
+  showScreen('game');
+  updateUI();
+  if (state.players[state.turn].isAI) setTimeout(() => performRoll(), 900);
+  else if (state.settings.timer) startTimer();
+}
+function goBackToCurrentGame() {
+  document.body.dataset.theme = state.settings.theme;
+  showScreen('game');
+  updateUI();
+  if (state.players[state.turn].isAI && !state.gameOver && !state.matchOver) setTimeout(() => performRoll(), 900);
+  else if (state.settings.timer && !state.gameOver && !state.matchOver) startTimer();
+}
+
+// ==================== НАСТРОЙКИ UI ====================
+function buildChancesUI(initialWeights) {
+  const wrap = document.getElementById('diceChances');
+  wrap.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const item = document.createElement('div');
+    item.className = 'chance-item';
+    item.innerHTML = '<div class="chance-face">' + DICE_FACES[i] + '</div><input type="number" min="0" max="100" step="1" class="chance-input" data-face="' + i + '" value="' + initialWeights[i] + '"><div class="chance-pct">' + (i + 1) + '</div>';
+    wrap.appendChild(item);
+  }
+  wrap.querySelectorAll('.chance-input').forEach(inp => inp.addEventListener('input', updateChanceSum));
+  updateChanceSum();
+}
+function getCurrentWeights() {
+  const inputs = document.querySelectorAll('.chance-input');
+  const w = [];
+  inputs.forEach(inp => { let v = parseInt(inp.value, 10); if (isNaN(v) || v < 0) v = 0; if (v > 100) v = 100; w.push(v); });
+  return w;
+}
+function updateChanceSum() {
+  const w = getCurrentWeights();
+  const sum = w.reduce((a, b) => a + b, 0);
+  const el = document.getElementById('chanceSum');
+  el.textContent = 'Сумма: ' + sum + '%' + (sum === 100 ? ' ✓' : ' (нужно 100%)');
+  el.classList.toggle('invalid', sum !== 100);
+  document.querySelectorAll('.chance-input').forEach(inp => inp.classList.toggle('invalid', sum !== 100));
+  return sum;
+}
+function setWeightsTo(w) { const inputs = document.querySelectorAll('.chance-input'); inputs.forEach((inp, i) => { inp.value = w[i]; }); updateChanceSum(); }
+
+function setupSettingsUI() {
+  const saved = getSettings();
+  const defaults = defaultSettings();
+  const cfg = Object.assign({}, defaults, saved);
+  if (!cfg.diceWeights || cfg.diceWeights.length !== 6) cfg.diceWeights = DEFAULT_WEIGHTS.slice();
+  if (!cfg.difficulty) cfg.difficulty = 'normal';
+
+  document.body.dataset.theme = cfg.theme;
+  document.getElementById('themeSelect').value = cfg.theme;
+
+  buildChancesUI(cfg.diceWeights);
+  document.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.onclick = () => {
+      const p = btn.dataset.preset;
+      if (p === 'equal') setWeightsTo([17,17,17,17,16,16]);
+      else if (p === 'high') setWeightsTo([30,25,18,13,9,5]);
+      else if (p === 'low') setWeightsTo([5,9,13,18,25,30]);
+      else if (p === 'normalize') setWeightsTo(normalizeWeights(getCurrentWeights()));
+    };
+  });
+
+  let playerCount = cfg.playerCount || 2;
+  let vsAI = cfg.vsAI || false;
+  let difficulty = cfg.difficulty;
+
+  const updateDiffVisibility = () => { document.getElementById('difficultySection').style.display = (playerCount === 2 && vsAI) ? 'block' : 'none'; };
+  const setDiff = v => {
+    difficulty = v;
+    document.querySelectorAll('[data-diff]').forEach(x => x.classList.toggle('active', x.dataset.diff === v));
+    const desc = {
+      easy: '😊 ИИ бросает медленно (чаще 1-2), часто не доходит до 100 — победа почти гарантирована',
+      normal: '😐 Равные шансы — кто первым дойдёт до 100',
+      hard: '😠 ИИ бросает быстро (чаще 5-6) — он будет впереди большую часть игры',
+      nightmare: '💀 ИИ бросает очень быстро + игнорирует красные (40%) + при переборе упирается в 100. Победа — почти чудо'
+    };
+    document.getElementById('diffDesc').textContent = desc[v] || '';
+  };
+  setDiff(difficulty);
+  document.querySelectorAll('[data-diff]').forEach(b => b.onclick = () => setDiff(b.dataset.diff));
+
+  document.querySelectorAll('[data-pc]').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.pc, 10) === playerCount);
+    b.onclick = () => {
+      playerCount = parseInt(b.dataset.pc, 10);
+      document.querySelectorAll('[data-pc]').forEach(x => x.classList.toggle('active', x === b));
+      document.getElementById('nameRow3').style.display = playerCount >= 3 ? 'flex' : 'none';
+      document.getElementById('nameRow4').style.display = playerCount >= 4 ? 'flex' : 'none';
+      document.getElementById('vsAIRow').style.display = playerCount === 2 ? 'flex' : 'none';
+      updateDiffVisibility();
+    };
+  });
+  document.getElementById('nameRow3').style.display = playerCount >= 3 ? 'flex' : 'none';
+  document.getElementById('nameRow4').style.display = playerCount >= 4 ? 'flex' : 'none';
+  document.getElementById('vsAIRow').style.display = playerCount === 2 ? 'flex' : 'none';
+  document.getElementById('name1').value = cfg.name1 || 'Игрок 1';
+  document.getElementById('name2').value = cfg.name2 || 'Игрок 2';
+  document.getElementById('name3').value = cfg.name3 || 'Игрок 3';
+  document.getElementById('name4').value = cfg.name4 || 'Игрок 4';
+
+  const setAI = v => { vsAI = v; document.getElementById('vsAIYes').classList.toggle('active', v); document.getElementById('vsAINo').classList.toggle('active', !v); updateDiffVisibility(); };
+  setAI(vsAI);
+  document.getElementById('vsAIYes').onclick = () => setAI(true);
+  document.getElementById('vsAINo').onclick = () => setAI(false);
+
+  let sound = cfg.sound !== false;
+  const setSnd = v => { sound = v; document.getElementById('soundOn').classList.toggle('active', v); document.getElementById('soundOff').classList.toggle('active', !v); };
+  setSnd(sound);
+  document.getElementById('soundOn').onclick = () => setSnd(true);
+  document.getElementById('soundOff').onclick = () => setSnd(false);
+
+  let vib = cfg.vibrate !== false;
+  const setVib = v => { vib = v; document.getElementById('vibOn').classList.toggle('active', v); document.getElementById('vibOff').classList.toggle('active', !v); };
+  setVib(vib);
+  document.getElementById('vibOn').onclick = () => setVib(true);
+  document.getElementById('vibOff').onclick = () => setVib(false);
+
+  let timer = cfg.timer || false;
+  const setTmr = v => { timer = v; document.getElementById('timerOn').classList.toggle('active', v); document.getElementById('timerOff').classList.toggle('active', !v); };
+  setTmr(timer);
+  document.getElementById('timerOn').onclick = () => setTmr(true);
+  document.getElementById('timerOff').onclick = () => setTmr(false);
+  document.getElementById('themeSelect').onchange = e => { document.body.dataset.theme = e.target.value; };
+
+  document.getElementById('openAdminBtn').onclick = () => showAdminModal();
+  document.getElementById('closeAdminBtn').onclick = () => { setAdmin(false); showToast('🔧 Админ-панель отключена'); };
+
+  if (state && !state.matchOver) saveState();
+
+  document.getElementById('startBtn').onclick = () => {
+    getAudioCtx();
+    let weights = getCurrentWeights();
+    const sum = weights.reduce((a, b) => a + b, 0);
+    if (sum !== 100) { weights = normalizeWeights(weights); setWeightsTo(weights); showToast('Шансы нормализованы до 100%'); }
+    const proceed = () => {
+      const finalWeights = getCurrentWeights();
+      const names = [
+        document.getElementById('name1').value.trim() || 'Игрок 1',
+        document.getElementById('name2').value.trim() || 'Игрок 2',
+        document.getElementById('name3').value.trim() || 'Игрок 3',
+        document.getElementById('name4').value.trim() || 'Игрок 4'
+      ];
+      const s = { theme: document.getElementById('themeSelect').value, sound, vibrate: vib, timer, playerCount, vsAI, name1: names[0], name2: names[1], name3: names[2], name4: names[3], diceWeights: finalWeights, difficulty };
+      saveSettings(s);
+      startNewGame(s, names);
+    };
+    if (state && !state.matchOver && state.players && state.players.length > 0) {
+      showModalConfirm('Начать новый матч?\n\nТекущий прогресс будет потерян.\nЕсли хочешь вернуться — нажми «Продолжить» сверху.', proceed);
+    } else {
+      proceed();
+    }
+  };
+
+  document.getElementById('recordsBtn').onclick = showRecords;
+  document.getElementById('achievementsBtn').onclick = showAchievements;
+
+  const contBtn = document.getElementById('continueBtn');
+  const savedState = loadState();
+  if (state && !state.matchOver && state.players) {
+    contBtn.disabled = false;
+    contBtn.classList.add('continue-active');
+    contBtn.textContent = '⏯ Продолжить матч — ' + state.players.map(p => p.name + ' ' + p.score).join(' : ');
+    contBtn.onclick = () => goBackToCurrentGame();
+  } else if (savedState) {
+    contBtn.disabled = false;
+    contBtn.classList.add('continue-active');
+    contBtn.textContent = '⏯ Загрузить матч — ' + savedState.players.map(p => p.name + ' ' + p.score).join(' : ');
+    contBtn.onclick = () => resumeGame(savedState);
+  } else {
+    contBtn.disabled = true;
+    contBtn.classList.remove('continue-active');
+    contBtn.textContent = '⏯ Нет сохранённого матча';
+    contBtn.onclick = null;
+  }
+}
+
+// ==================== СЕКРЕТЫ АДМИНКИ ====================
+let titleTaps = 0;
+let titleTapTimer = null;
+
+function setupAdminSecret() {
+  const title = document.getElementById('settingsTitle');
+  if (title) {
+    title.addEventListener('click', () => {
+      titleTaps++;
+      clearTimeout(titleTapTimer);
+      titleTapTimer = setTimeout(() => { titleTaps = 0; }, 3000);
+      if (titleTaps >= 5) {
+        titleTaps = 0;
+        adminSecretUnlocked = true;
+        showToast('🔓 Секрет разблокирован! Нажми на «версия 1.0»', 'success');
+        const link = document.getElementById('versionLink');
+        if (link) { link.style.opacity = '1'; link.style.color = '#ffd93d'; link.style.fontWeight = 'bold'; link.textContent = 'версия 1.0 🔓'; }
+      }
+    });
+  }
+  const link = document.getElementById('versionLink');
+  if (link) {
+    link.addEventListener('click', () => {
+      if (adminActive) {
+        showModalConfirm('Админ-панель активна.\n\nОтключить?', () => {
+          setAdmin(false);
+          showToast('🔧 Админ-панель отключена');
+        });
+      } else if (adminSecretUnlocked) {
+        showAdminCodePrompt();
+      } else {
+        showToast('Сначала 5 раз тапни по названию игры');
+      }
+    });
+  }
+}
+
+function showAdminCodePrompt() {
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  const card = document.createElement('div');
+  card.className = 'confirm-card';
+  card.innerHTML =
+    '<div style="font-size:15px;margin-bottom:14px;line-height:1.5;">🔒 Введите код доступа:</div>' +
+    '<input type="password" inputmode="numeric" id="adminCodeInput" placeholder="••••" ' +
+    'style="width:100%;padding:14px;font-size:22px;text-align:center;letter-spacing:8px;' +
+    'background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);' +
+    'border-radius:10px;color:white;outline:none;margin-bottom:14px;box-sizing:border-box;" maxlength="10">' +
+    '<div id="adminCodeError" style="color:#ff6b6b;font-size:12px;margin-bottom:8px;min-height:16px;"></div>' +
+    '<div class="confirm-btns"><button class="confirm-no">Отмена</button><button class="confirm-yes">Войти</button></div>';
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+
+  const input = card.querySelector('#adminCodeInput');
+  const error = card.querySelector('#adminCodeError');
+  setTimeout(() => input.focus(), 100);
+
+  function trySubmit() {
+    if (input.value === '7777') {
+      overlay.remove();
+      adminCodeEntered = true;
+      const banner = document.getElementById('adminUnlockBanner');
+      if (banner) {
+        banner.style.display = 'block';
+        setTimeout(() => banner.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+      }
+      showToast('🔓 Код верный! Нажми «Использовать админ-панель»', 'success');
+    } else {
+      error.textContent = 'Неверный код';
+      input.value = '';
+      input.focus();
+    }
+  }
+  card.querySelector('.confirm-no').onclick = () => overlay.remove();
+  card.querySelector('.confirm-yes').onclick = trySubmit;
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') trySubmit(); });
+  input.addEventListener('input', () => { error.textContent = ''; });
+}
+
+// ==================== АДМИН-МОДАЛКА ====================
+function showAdminModal() {
+  if (!adminActive) { showToast('Нет доступа к админ-панели', 'error'); return; }
+  if (!state || !state.players) { showToast('Сначала начните или продолжите матч'); return; }
+  const list = document.getElementById('adminPlayersList');
+  let html = '';
+  state.players.forEach(p => {
+    const val = (state.adminForce && state.adminForce[p.id] != null) ? state.adminForce[p.id] : '';
+    html += '<div class="admin-player-row">' +
+      '<div class="admin-player-info">' + p.emoji + ' ' + escapeHTML(p.name) + '</div>' +
+      '<div class="admin-controls">' +
+      '<label style="font-size:11px;opacity:0.7;">Кубик:</label>' +
+      '<select data-aid="' + p.id + '">' +
+      '<option value="">По шансам</option>' +
+      [1,2,3,4,5,6].map(n => '<option value="' + n + '"' + (String(val) === String(n) ? ' selected' : '') + '>' + n + '</option>').join('') +
+      '</select>' +
+      '<label style="font-size:11px;opacity:0.7;margin-left:6px;">Поз:</label>' +
+      '<input type="number" data-apos="' + p.id + '" min="1" max="100" value="' + p.pos + '">' +
+      '<label style="font-size:11px;opacity:0.7;margin-left:6px;">Счёт:</label>' +
+      '<input type="number" data-ascore="' + p.id + '" min="0" max="99" value="' + p.score + '">' +
+      '</div>' +
+      '</div>';
+  });
+  list.innerHTML = html;
+
+  list.querySelectorAll('select').forEach(sel => {
+    sel.onchange = () => {
+      const id = parseInt(sel.dataset.aid, 10);
+      const v = sel.value;
+      if (!state.adminForce) state.adminForce = {};
+      if (v === '') delete state.adminForce[id];
+      else state.adminForce[id] = parseInt(v, 10);
+    };
+  });
+  list.querySelectorAll('[data-apos]').forEach(inp => {
+    inp.onchange = () => {
+      const id = parseInt(inp.dataset.apos, 10);
+      const v = Math.max(1, Math.min(100, parseInt(inp.value, 10) || 1));
+      const p = state.players.find(x => x.id === id);
+      if (p) { p.pos = v; placeTokens(); inp.value = v; }
+    };
+  });
+  list.querySelectorAll('[data-ascore]').forEach(inp => {
+    inp.onchange = () => {
+      const id = parseInt(inp.dataset.ascore, 10);
+      const v = Math.max(0, Math.min(99, parseInt(inp.value, 10) || 0));
+      const p = state.players.find(x => x.id === id);
+      if (p) { p.score = v; updateScores(); inp.value = v; }
+    };
+  });
+  document.getElementById('adminModal').style.display = 'flex';
+}
+
+document.getElementById('adminSkipTurnBtn').onclick = () => {
+  if (!state || !state.players) return;
+  addHistory('⏭ Админ: пропуск хода', 'round');
+  endTurn();
+  document.getElementById('adminModal').style.display = 'none';
+};
+
+// ==================== КНОПКА АКТИВАЦИИ ====================
+document.getElementById('activateAdminBtn').onclick = () => {
+  setAdmin(true);
+  adminCodeEntered = false;
+  adminSecretUnlocked = false;
+  document.getElementById('adminUnlockBanner').style.display = 'none';
+  const link = document.getElementById('versionLink');
+  if (link) { link.style.opacity = '0.35'; link.style.color = ''; link.style.fontWeight = ''; link.textContent = 'версия 1.0'; }
+  showToast('🔧 Админ-панель АКТИВИРОВАНА!', 'success');
+};
+
+// ==================== ИГРОВЫЕ КНОПКИ ====================
+document.getElementById('adminBtn').onclick = showAdminModal;
+
+document.getElementById('restartBtn').onclick = () => {
+  if (!state) return;
+  showModalConfirm('Начать новый матч?\n\nТекущий прогресс потеряется.', () => {
+    clearTimer(); clearSaveState();
+    startNewGame(state.settings, state.players.map(p => p.name));
+  });
+};
+document.getElementById('settingsBtn').onclick = () => {
+  if (state && !state.matchOver) saveState();
+  clearTimer();
+  showScreen('settings');
+  setupSettingsUI();
+};
+document.getElementById('newMatchBtn').onclick = () => {
+  document.getElementById('winScreen').style.display = 'none';
+  clearSaveState();
+  startNewGame(state.settings, state.players.map(p => p.name));
+};
+document.getElementById('toSettingsBtn').onclick = () => {
+  document.getElementById('winScreen').style.display = 'none';
+  showScreen('settings');
+  setupSettingsUI();
+};
+document.getElementById('shareBtn').onclick = async () => {
+  if (!state) return;
+  const winner = state.players.find(p => p.score >= 3);
+  if (!winner) return;
+  unlockAchievement('sharer');
+  const otherScore = Math.max(...state.players.filter(p => p !== winner).map(p => p.score));
+  const diffTag = (state.settings.vsAI && state.settings.difficulty) ? ' [' + (DIFFICULTY_LABELS[state.settings.difficulty] || DIFFICULTY_LABELS.normal).name + ']' : '';
+  const text = winner.emoji + ' ' + winner.name + ' выиграл в "Змейки и Лестницы" со счётом ' + winner.score + ':' + otherScore + diffTag + '! 🎲';
+  if (navigator.share) { try { await navigator.share({ title: 'Змейки и Лестницы', text }); } catch {} }
+  else if (navigator.clipboard) { try { await navigator.clipboard.writeText(text); showToast('Скопировано в буфер', 'success'); } catch {} }
+  else showToast(text);
+};
+
+document.getElementById('uploadWinBtn').onclick = () => document.getElementById('winImageInput').click();
+document.getElementById('removeWinBtn').onclick = () => {
+  showModalConfirm('Удалить картинку?', () => { removeWinImage(); updateWinImage(); });
+};
+document.getElementById('winImageInput').onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('Это не картинка', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxSize = 800;
+      let w = img.width, h = img.height;
+      if (w > maxSize || h > maxSize) {
+        if (w > h) { h = h * maxSize / w; w = maxSize; }
+        else { w = w * maxSize / h; h = maxSize; }
+      }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      saveWinImage(dataUrl);
+      updateWinImage();
+      showToast('Картинка сохранена!', 'success');
+    };
+    img.onerror = () => showToast('Не удалось прочитать картинку', 'error');
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+};
+
+// ==================== ИНИЦИАЛИЗАЦИЯ ====================
+try { if (localStorage.getItem('zmeyki_admin') === '1') adminActive = true; } catch {}
+setupSettingsUI();
+setupAdminSecret();
+updateAdminUI();
+showScreen('settings');
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
