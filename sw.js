@@ -1,4 +1,4 @@
-const CACHE = 'zmeyki-v1';
+const CACHE = 'zmeyki-v2';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
