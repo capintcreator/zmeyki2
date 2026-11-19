@@ -21,7 +21,7 @@
   .screen.hidden { display: none; }
   button { cursor: pointer; font-family: inherit; border: none; color: inherit; }
   .settings-content { padding: 16px; max-width: 520px; margin: 0 auto; width: 100%; }
-  .settings-title { font-size: 26px; font-weight: 800; text-align: center; margin: 10px 0 18px; background: linear-gradient(135deg,#667eea,#a855f7,#4ea8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; cursor: pointer; user-select: none; }
+  .settings-title { font-size: 26px; font-weight: 800; text-align: center; margin: 10px 0 18px; background: linear-gradient(135deg,#667eea,#a855f7,#4ea8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; user-select: none; }
   .settings-section { background: var(--panel); border-radius: 16px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,.15); }
   .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; opacity: .65; font-weight: 700; margin-bottom: 10px; }
   .row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; gap: 10px; font-size: 14px; }
@@ -37,7 +37,6 @@
   .toggle-btn[data-diff="hard"].active { background: linear-gradient(135deg,#f97316,#ea580c)!important; }
   .toggle-btn[data-diff="nightmare"].active { background: linear-gradient(135deg,#a855f7,#dc2626)!important; }
   #difficultySection { display: none; }
-  #adminSection { display: none; border-color: #f59e0b; }
   .diff-desc { font-size: 12px; opacity: .75; margin-top: 8px; text-align: center; line-height: 1.4; padding: 8px; border-radius: 8px; background: var(--panel-strong); }
   .big-btn { background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; font-size: 17px; font-weight: bold; padding: 16px; border-radius: 14px; width: 100%; margin-top: 8px; box-shadow: 0 6px 24px rgba(102,126,234,.5), inset 0 1px 0 rgba(255,255,255,.25); transition: transform .1s; position: relative; overflow: hidden; }
   .big-btn::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(180deg, rgba(255,255,255,.15), transparent); pointer-events: none; }
@@ -46,7 +45,6 @@
   .big-btn.secondary::before { display: none; }
   .big-btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
   .big-btn.continue-active { background: linear-gradient(135deg,#22c55e,#16a34a)!important; box-shadow: 0 6px 24px rgba(34,197,94,.5), inset 0 1px 0 rgba(255,255,255,.25)!important; font-size: 16px; }
-  .big-btn.admin-btn-style { background: linear-gradient(135deg,#f59e0b,#d97706)!important; box-shadow: 0 6px 24px rgba(245,158,11,.5), inset 0 1px 0 rgba(255,255,255,.25)!important; }
   .dice-chances { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 10px; }
   .chance-item { background: var(--panel-strong); border-radius: 10px; padding: 8px; text-align: center; }
   .chance-face { font-size: 22px; margin-bottom: 2px; }
@@ -128,8 +126,6 @@
   .history-item.p3 { border-left: 3px solid #a855f7; }
   .history-item.p4 { border-left: 3px solid #ec4899; }
   .history-item.round { text-align: center; color: #ffd93d; background: rgba(255,217,61,.12); font-weight: bold; border-left: none; }
-  .admin-floating-btn { position: fixed; top: calc(6px + env(safe-area-inset-top)); right: 8px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,.4); border: 1px solid var(--border); color: var(--text); font-size: 15px; z-index: 150; display: none; align-items: center; justify-content: center; opacity: .5; transition: all .2s; padding: 0; backdrop-filter: blur(8px); }
-  .admin-floating-btn:hover, .admin-floating-btn:active { opacity: 1; transform: scale(1.1); }
   .diff-badge { position: fixed; top: calc(6px + env(safe-area-inset-top)); left: 8px; padding: 6px 14px; border-radius: 18px; background: rgba(0,0,0,.5); border: 1px solid var(--border); font-size: 11px; font-weight: 800; z-index: 150; display: none; backdrop-filter: blur(8px); }
   .win-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(14px); display: flex; align-items: center; justify-content: center; z-index: 500; padding: 16px; overflow-y: auto; }
   .win-card { background: var(--bg); border: 2px solid transparent; background-clip: padding-box; border-radius: 24px; padding: 22px; max-width: 440px; width: 100%; text-align: center; max-height: 90vh; overflow-y: auto; box-shadow: 0 0 0 2px rgba(102,126,234,.5), 0 20px 60px rgba(0,0,0,.7); }
@@ -157,7 +153,6 @@
   .ach-icon { font-size: 24px; }
   .ach-name { font-weight: bold; }
   .ach-desc { font-size: 11px; opacity: .7; }
-  .admin-note { font-size: 11px; opacity: .7; text-align: center; margin-bottom: 12px; line-height: 1.4; }
   .toast-msg { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); color: #fff; padding: 14px 22px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 99999; box-shadow: 0 8px 32px rgba(0,0,0,.5); max-width: 90vw; text-align: center; transition: opacity .4s; }
   .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
   .confirm-card { background: linear-gradient(135deg,#1a1a2e,#16213e); border: 2px solid #667eea; border-radius: 16px; padding: 22px; max-width: 380px; width: 100%; text-align: center; color: #fff; box-shadow: 0 20px 60px rgba(0,0,0,.7); }
@@ -165,17 +160,24 @@
   .confirm-btns { display: flex; gap: 10px; }
   .confirm-no { flex: 1; background: rgba(255,255,255,.14); color: #fff; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; }
   .confirm-yes { flex: 1; background: linear-gradient(135deg,#22c55e,#16a34a); color: #fff; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; }
-  .admin-unlock-banner { background: linear-gradient(135deg,#f59e0b,#d97706); border: 3px solid #fbbf24; border-radius: 16px; padding: 20px; margin-bottom: 12px; text-align: center; box-shadow: 0 8px 32px rgba(245,158,11,.6); animation: banner-pulse 2s infinite; }
-  @keyframes banner-pulse { 0%,100% { box-shadow: 0 8px 32px rgba(245,158,11,.6); } 50% { box-shadow: 0 8px 48px rgba(245,158,11,1); } }
-  .admin-unlock-icon { font-size: 44px; margin-bottom: 6px; }
-  .admin-unlock-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 14px; letter-spacing: 1px; text-shadow: 0 2px 6px rgba(0,0,0,.3); }
-  .admin-player-row { display: flex; flex-direction: column; gap: 6px; padding: 10px; background: var(--panel-strong); border-radius: 10px; margin-bottom: 8px; font-size: 13px; }
-  .admin-player-info { font-weight: 600; margin-bottom: 4px; }
-  .admin-controls { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-  .admin-controls select, .admin-controls input[type="number"] { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 6px 8px; border-radius: 6px; font-size: 12px; }
-  .admin-controls input[type="number"] { width: 60px; text-align: center; }
-  .admin-controls button { background: var(--panel-strong); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
-  .admin-big-action { background: linear-gradient(135deg,#f59e0b,#d97706); color: #fff; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; width: 100%; margin-top: 8px; }
+  /* Инвентарь */
+  .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
+  .accessory-item { background: var(--panel-strong); border-radius: 10px; padding: 8px; display: flex; align-items: center; gap: 6px; font-size: 12px; position: relative; cursor: pointer; border: 2px solid transparent; transition: all .2s; }
+  .accessory-item.equipped { border-color: #22c55e; box-shadow: 0 0 10px rgba(34,197,94,.4); }
+  .accessory-icon { font-size: 22px; }
+  .accessory-info { flex: 1; overflow: hidden; }
+  .accessory-name { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .accessory-desc { font-size: 10px; opacity: .7; }
+  .accessory-rarity { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+  .rarity-common { color: #94a3b8; }
+  .rarity-uncommon { color: #22c55e; }
+  .rarity-rare { color: #3b82f6; }
+  .rarity-epic { color: #a855f7; }
+  .rarity-legendary { color: #f59e0b; }
+  .rarity-mythic { color: #ef4444; }
+  .chest-btn { background: linear-gradient(135deg,#f59e0b,#d97706); color: #fff; font-weight: 800; font-size: 15px; padding: 14px; border-radius: 14px; width: 100%; margin-top: 8px; box-shadow: 0 6px 24px rgba(245,158,11,.5); }
+  .chest-btn:disabled { opacity: .5; box-shadow: none; }
+  .crystals-display { font-size: 18px; font-weight: 800; text-align: center; padding: 8px; background: var(--panel-strong); border-radius: 10px; margin-bottom: 8px; }
 </style>
 </head>
 <body data-theme="dark">
@@ -183,12 +185,6 @@
 <div id="settingsScreen" class="screen">
   <div class="settings-content">
     <div class="settings-title" id="settingsTitle">🎲 Змейки и Лестницы</div>
-
-    <div id="adminUnlockBanner" class="admin-unlock-banner" style="display:none">
-      <div class="admin-unlock-icon">🔓</div>
-      <div class="admin-unlock-title">АДМИН-ПАНЕЛЬ ДОСТУПНА</div>
-      <button id="activateAdminBtn" class="big-btn admin-btn-style">🎯 Использовать админ-панель</button>
-    </div>
 
     <button class="big-btn secondary" id="continueBtn" disabled>⏯ Нет сохранённого матча</button>
     <button class="big-btn" id="startBtn">▶ Начать новый матч</button>
@@ -216,12 +212,11 @@
       </div>
     </div>
 
-    <div class="settings-section" id="adminSection">
-      <div class="section-title">🔧 Админ-панель (активна)</div>
-      <div class="row" style="flex-direction:column;align-items:stretch;gap:8px">
-        <button class="big-btn admin-btn-style" id="openAdminBtn">🔧 Открыть админ-панель</button>
-        <button class="big-btn secondary" id="closeAdminBtn">🚫 Отключить админку</button>
-      </div>
+    <div class="settings-section">
+      <div class="section-title">💎 Инвентарь</div>
+      <div class="crystals-display" id="crystalsDisplay">💎 0</div>
+      <button class="chest-btn" id="openChestBtn">📦 Открыть сундук (50 💎)</button>
+      <div class="inventory-grid" id="inventoryGrid"></div>
     </div>
 
     <div class="settings-section">
@@ -248,14 +243,13 @@
     <button class="big-btn secondary" id="achievementsBtn">🏅 Достижения</button>
 
     <div style="text-align:center;padding:20px 0 4px;">
-      <span id="versionLink" style="font-size:11px;opacity:0.35;cursor:pointer;user-select:none;display:inline-block;padding:6px 12px;">версия 1.0</span>
+      <span id="versionLink" style="font-size:11px;opacity:0.35;display:inline-block;padding:6px 12px;">версия 1.0</span>
     </div>
   </div>
 </div>
 
 <div id="gameScreen" class="screen hidden">
   <div class="diff-badge" id="diffBadge"></div>
-  <button class="admin-floating-btn" id="adminBtn" title="Админ">🔧</button>
   <div class="score-bar" id="scoreBar"></div>
   <div class="board-wrap">
     <div class="board" id="board">
@@ -292,22 +286,20 @@
   </div>
 </div>
 
-<div id="adminModal" class="modal" style="display:none">
-  <div class="modal-card">
-    <div class="modal-title">🔧 Админ-панель</div>
-    <div class="admin-note">Полный контроль: кубик, позиция, счёт каждого игрока.</div>
-    <div id="adminPlayersList"></div>
-    <button class="admin-big-action" id="adminSkipTurnBtn">⏭ Пропустить ход (следующий игрок)</button>
-    <button class="close" onclick="document.getElementById('adminModal').style.display='none'">Закрыть</button>
-  </div>
-</div>
-
 <div id="recordsModal" class="modal" style="display:none">
   <div class="modal-card"><div class="modal-title">📈 Рекорды</div><div id="recordsList"></div><button class="close" onclick="document.getElementById('recordsModal').style.display='none'">Закрыть</button></div>
 </div>
 
 <div id="achievementsModal" class="modal" style="display:none">
   <div class="modal-card"><div class="modal-title">🏅 Достижения</div><div id="achievementsList"></div><button class="close" onclick="document.getElementById('achievementsModal').style.display='none'">Закрыть</button></div>
+</div>
+
+<div id="chestResultModal" class="modal" style="display:none">
+  <div class="modal-card">
+    <div class="modal-title">📦 Сундук открыт!</div>
+    <div id="chestResultContent" style="text-align:center;padding:12px;"></div>
+    <button class="close" onclick="document.getElementById('chestResultModal').style.display='none'">Закрыть</button>
+  </div>
 </div>
 
 <script>
@@ -381,22 +373,155 @@ const DIFFICULTY_LABELS = { easy: { name: 'Легко', short: '😊 Легко'
 function rollWithWeights(weights) { if (!weights || weights.length !== 6) return 1 + Math.floor(Math.random() * 6); const sum = weights.reduce((a, b) => a + b, 0); if (sum <= 0) return 1 + Math.floor(Math.random() * 6); let r = Math.random() * sum; for (let i = 0; i < 6; i++) { r -= weights[i]; if (r < 0) return i + 1; } return 6; }
 function normalizeWeights(w) { const sum = w.reduce((a, b) => a + b, 0); if (sum <= 0) return DEFAULT_WEIGHTS.slice(); const raw = w.map(v => v * 100 / sum); const floored = raw.map(v => Math.floor(v)); let diff = 100 - floored.reduce((a, b) => a + b, 0); const withFrac = raw.map((v, i) => ({ i, frac: v - floored[i] })); withFrac.sort((a, b) => b.frac - a.frac); for (let k = 0; k < diff; k++) floored[withFrac[k % 6].i]++; return floored; }
 
-// ==================== АДМИН (в памяти!) ====================
-let adminActive = false;
-let adminSecretUnlocked = false;
-let adminCodeEntered = false;
+// ==================== АКСЕССУАРЫ ====================
+const ACCESSORIES = [
+  { id: 'cap', name: 'Кепка', icon: '🧢', rarity: 'common', desc: '+1% к удаче', effect: { type: 'luck', value: 1 } },
+  { id: 'glasses', name: 'Солнечные очки', icon: '🕶️', rarity: 'uncommon', desc: '+2% к удаче', effect: { type: 'luck', value: 2 } },
+  { id: 'chain', name: 'Золотая цепочка', icon: '📿', rarity: 'rare', desc: '+5% к заработку', effect: { type: 'earn', value: 5 } },
+  { id: 'ring', name: 'Кольцо удачи', icon: '💍', rarity: 'epic', desc: '+3% к удаче', effect: { type: 'luck', value: 3 } },
+  { id: 'crown', name: 'Корона', icon: '👑', rarity: 'legendary', desc: '+5% к удаче', effect: { type: 'luck', value: 5 } },
+  { id: 'amulet', name: 'Амулет', icon: '🔮', rarity: 'mythic', desc: '+10% к удаче', effect: { type: 'luck', value: 10 } }
+];
+const RARITY_NAMES = { common: 'Обычный', uncommon: 'Необычный', rare: 'Редкий', epic: 'Эпический', legendary: 'Легендарный', mythic: 'Мифический' };
+const RARITY_CLASS = { common: 'rarity-common', uncommon: 'rarity-uncommon', rare: 'rarity-rare', epic: 'rarity-epic', legendary: 'rarity-legendary', mythic: 'rarity-mythic' };
+const BASE_RARITY_WEIGHTS = { common: 44.8, uncommon: 35, rare: 15, epic: 4, legendary: 1, mythic: 0.2 };
 
-function isAdmin() { return adminActive; }
-function setAdmin(v) {
-  adminActive = v;
-  try { localStorage.setItem('zmeyki_admin', v ? '1' : '0'); } catch {}
-  updateAdminUI();
+function getAccessoryById(id) { return ACCESSORIES.find(a => a.id === id); }
+function getPlayerLuck() {
+  if (!state || !state.equipped) return 0;
+  let luck = 0;
+  state.equipped.forEach(id => {
+    const acc = getAccessoryById(id);
+    if (acc && acc.effect.type === 'luck') luck += acc.effect.value;
+  });
+  return luck;
 }
-function updateAdminUI() {
-  const btn = document.getElementById('adminBtn');
-  if (btn) btn.style.display = adminActive ? 'flex' : 'none';
-  const section = document.getElementById('adminSection');
-  if (section) section.style.display = adminActive ? 'block' : 'none';
+function getPlayerEarnBonus() {
+  if (!state || !state.equipped) return 0;
+  let earn = 0;
+  state.equipped.forEach(id => {
+    const acc = getAccessoryById(id);
+    if (acc && acc.effect.type === 'earn') earn += acc.effect.value;
+  });
+  return earn;
+}
+function rollRarity() {
+  const luck = getPlayerLuck();
+  const weights = {};
+  let total = 0;
+  for (const r in BASE_RARITY_WEIGHTS) {
+    let w = BASE_RARITY_WEIGHTS[r];
+    if (r !== 'common') w *= (1 + luck / 100);
+    weights[r] = w;
+    total += w;
+  }
+  let r = Math.random() * total;
+  for (const rar in weights) {
+    r -= weights[rar];
+    if (r < 0) return rar;
+  }
+  return 'common';
+}
+function openChest() {
+  if (!state) return;
+  if (state.crystals < 50) { showToast('Недостаточно кристаллов! Нужно 50 💎', 'error'); return; }
+  state.crystals -= 50;
+  const rarity = rollRarity();
+  const possible = ACCESSORIES.filter(a => a.rarity === rarity);
+  let acc;
+  if (possible.length === 0) {
+    // fallback на common
+    const commons = ACCESSORIES.filter(a => a.rarity === 'common');
+    acc = commons[Math.floor(Math.random() * commons.length)];
+  } else {
+    acc = possible[Math.floor(Math.random() * possible.length)];
+  }
+  let isNew = false;
+  if (!state.inventory) state.inventory = [];
+  if (!state.inventory.includes(acc.id)) {
+    state.inventory.push(acc.id);
+    isNew = true;
+  } else {
+    state.crystals += 10;
+    showToast('Дубликат! +10 💎', 'success');
+  }
+  updateCrystalsDisplay();
+  renderInventory();
+  savePlayerData();
+  // Показать модалку
+  const modal = document.getElementById('chestResultModal');
+  const content = document.getElementById('chestResultContent');
+  content.innerHTML = '<div style="font-size:60px;margin-bottom:8px;">' + acc.icon + '</div>' +
+    '<div style="font-size:20px;font-weight:800;margin-bottom:4px;">' + acc.name + '</div>' +
+    '<div class="accessory-rarity ' + RARITY_CLASS[acc.rarity] + '" style="font-size:13px;margin-bottom:8px;">' + RARITY_NAMES[acc.rarity] + '</div>' +
+    '<div style="font-size:14px;opacity:0.8;margin-bottom:12px;">' + acc.desc + '</div>' +
+    (isNew ? '<div style="color:#22c55e;font-weight:700;">✨ Новый аксессуар!</div>' : '<div style="color:#94a3b8;">Уже был в инвентаре</div>');
+  modal.style.display = 'flex';
+}
+function updateCrystalsDisplay() {
+  const el = document.getElementById('crystalsDisplay');
+  if (el) el.textContent = '💎 ' + (state.crystals || 0);
+  const btn = document.getElementById('openChestBtn');
+  if (btn) btn.disabled = !state || state.crystals < 50;
+}
+function renderInventory() {
+  const grid = document.getElementById('inventoryGrid');
+  if (!grid) return;
+  if (!state || !state.inventory || state.inventory.length === 0) {
+    grid.innerHTML = '<div style="text-align:center;opacity:0.6;padding:12px;font-size:12px;grid-column:1/-1;">Пока нет аксессуаров. Открой сундук!</div>';
+    return;
+  }
+  let html = '';
+  state.inventory.forEach(id => {
+    const acc = getAccessoryById(id);
+    if (!acc) return;
+    const equipped = state.equipped && state.equipped.includes(id);
+    html += '<div class="accessory-item ' + (equipped ? 'equipped' : '') + '" data-accid="' + id + '">' +
+      '<div class="accessory-icon">' + acc.icon + '</div>' +
+      '<div class="accessory-info">' +
+      '<div class="accessory-name">' + acc.name + '</div>' +
+      '<div class="accessory-desc">' + acc.desc + '</div>' +
+      '<div class="accessory-rarity ' + RARITY_CLASS[acc.rarity] + '">' + RARITY_NAMES[acc.rarity] + '</div>' +
+      '</div></div>';
+  });
+  grid.innerHTML = html;
+  grid.querySelectorAll('.accessory-item').forEach(el => {
+    el.onclick = () => {
+      const id = el.dataset.accid;
+      if (!state.equipped) state.equipped = [];
+      const idx = state.equipped.indexOf(id);
+      if (idx >= 0) {
+        state.equipped.splice(idx, 1);
+        showToast('Снято: ' + getAccessoryById(id).name);
+      } else {
+        state.equipped.push(id);
+        showToast('Надето: ' + getAccessoryById(id).name, 'success');
+      }
+      savePlayerData();
+      renderInventory();
+    };
+  });
+}
+function savePlayerData() {
+  try {
+    localStorage.setItem('zmeyki_crystals', JSON.stringify(state.crystals || 0));
+    localStorage.setItem('zmeyki_inventory', JSON.stringify(state.inventory || []));
+    localStorage.setItem('zmeyki_equipped', JSON.stringify(state.equipped || []));
+  } catch {}
+}
+function loadPlayerData() {
+  try {
+    const c = localStorage.getItem('zmeyki_crystals');
+    const inv = localStorage.getItem('zmeyki_inventory');
+    const eq = localStorage.getItem('zmeyki_equipped');
+    return {
+      crystals: c ? JSON.parse(c) : 0,
+      inventory: inv ? JSON.parse(inv) : [],
+      equipped: eq ? JSON.parse(eq) : []
+    };
+  } catch {
+    return { crystals: 0, inventory: [], equipped: [] };
+  }
 }
 
 // ==================== КОНСТАНТЫ ====================
@@ -428,13 +553,17 @@ function newMatch(settings, names) {
     const isAI = settings.vsAI && i === 1 && count === 2;
     players.push(newPlayer(meta, names[i] || ('Игрок ' + (i + 1)), isAI));
   }
+  const pd = loadPlayerData();
   state = {
     screen: 'game', players: players, playerCount: count,
     turn: 0, round: 1, rolling: false, gameOver: false, matchOver: false,
     special: null, history: [],
     settings: { theme: settings.theme, sound: settings.sound, vibrate: settings.vibrate, timer: settings.timer, vsAI: settings.vsAI, diceWeights: (settings.diceWeights || DEFAULT_WEIGHTS).slice(), difficulty: settings.difficulty || 'normal' },
     timerData: { timeout: null, remaining: 15 },
-    adminForce: {}, adminMode: 'always', newAchievements: []
+    newAchievements: [],
+    crystals: pd.crystals,
+    inventory: pd.inventory,
+    equipped: pd.equipped
   };
   state.special = generateSpecialCells();
   addHistory('▸ Раунд 1 — начинает ' + players[0].name, 'round');
@@ -563,6 +692,8 @@ function updateUI() {
   updateScores(); updateButtons(); updateDiffBadge();
   if (!state.gameOver && !state.matchOver) msgEl.textContent = 'Ход ' + state.players[state.turn].name;
   placeTokens();
+  updateCrystalsDisplay();
+  renderInventory();
 }
 function addHistory(text, type) { state.history.push({ text, type }); if (state.history.length > 80) state.history.shift(); renderHistory(); }
 function renderHistory() {
@@ -602,13 +733,8 @@ async function performRoll() {
   vibrate(30);
   const player = state.players[state.turn];
   let roll;
-  if (state.adminForce && state.adminForce[player.id] != null) {
-    roll = state.adminForce[player.id];
-    if (state.adminMode === 'once') delete state.adminForce[player.id];
-  } else {
-    const weightsForRoll = (player.isAI && state.settings.vsAI) ? (DIFFICULTY_WEIGHTS[state.settings.difficulty] || DIFFICULTY_WEIGHTS.normal) : state.settings.diceWeights;
-    roll = rollWithWeights(weightsForRoll);
-  }
+  const weightsForRoll = (player.isAI && state.settings.vsAI) ? (DIFFICULTY_WEIGHTS[state.settings.difficulty] || DIFFICULTY_WEIGHTS.normal) : state.settings.diceWeights;
+  roll = rollWithWeights(weightsForRoll);
   await animateDice(roll);
   player.stats.rolls++;
   player.stats.total += roll;
@@ -695,6 +821,13 @@ async function winRound() {
   addHistory('🎉 Раунд ' + state.round + ': ' + player.name + ' выиграл!', 'round');
   if (player.score >= 3) {
     state.matchOver = true; state.gameOver = true; state.rolling = false;
+    // Начисление кристаллов за победу в матче
+    const earnBonus = getPlayerEarnBonus();
+    const reward = Math.round(25 * (1 + earnBonus / 100));
+    state.crystals += reward;
+    savePlayerData();
+    updateCrystalsDisplay();
+    addHistory('💎 +' + reward + ' кристаллов за победу!', 'round');
     saveRecords(player);
     if (player.score === 3 && state.players.every(p => p === player || p.score === 0)) unlockAchievement('win_3_0');
     unlockAchievement('first_win');
@@ -842,7 +975,7 @@ function showAchievements() {
   document.getElementById('achievementsModal').style.display = 'flex';
 }
 
-// ==================== СОХРАНЕНИЕ ====================
+// ==================== СОХРАНЕНИЕ МАТЧА ====================
 function saveState() {
   if (!state || state.matchOver) return;
   try { const copy = JSON.parse(JSON.stringify(state)); delete copy.timerData; delete copy.newAchievements; copy.rolling = false; localStorage.setItem('zmeyki_state', JSON.stringify(copy)); } catch {}
@@ -856,11 +989,13 @@ function loadState() {
     if (!s || !s.players || s.matchOver) return null;
     s.timerData = { timeout: null, remaining: 15 };
     s.newAchievements = [];
-    s.adminForce = s.adminForce || {};
-    s.adminMode = s.adminMode || 'always';
     s.rolling = false;
     if (!s.settings.diceWeights || s.settings.diceWeights.length !== 6) s.settings.diceWeights = DEFAULT_WEIGHTS.slice();
     if (!s.settings.difficulty) s.settings.difficulty = 'normal';
+    const pd = loadPlayerData();
+    s.crystals = pd.crystals;
+    s.inventory = pd.inventory;
+    s.equipped = pd.equipped;
     return s;
   } catch { return null; }
 }
@@ -872,7 +1007,6 @@ function showScreen(name) {
   document.getElementById('settingsScreen').classList.toggle('hidden', name !== 'settings');
   document.getElementById('gameScreen').classList.toggle('hidden', name !== 'game');
   document.getElementById('winScreen').style.display = (name === 'win') ? 'flex' : 'none';
-  updateAdminUI();
 }
 function startNewGame(settings, names) {
   clearSaveState(); clearTimer();
@@ -890,8 +1024,6 @@ function resumeGame(savedState) {
   state = savedState;
   state.newAchievements = [];
   state.timerData = { timeout: null, remaining: 15 };
-  state.adminForce = state.adminForce || {};
-  state.adminMode = state.adminMode || 'always';
   if (!state.settings.diceWeights || state.settings.diceWeights.length !== 6) state.settings.diceWeights = DEFAULT_WEIGHTS.slice();
   if (!state.settings.difficulty) state.settings.difficulty = 'normal';
   document.body.dataset.theme = state.settings.theme;
@@ -1023,8 +1155,12 @@ function setupSettingsUI() {
   document.getElementById('timerOff').onclick = () => setTmr(false);
   document.getElementById('themeSelect').onchange = e => { document.body.dataset.theme = e.target.value; };
 
-  document.getElementById('openAdminBtn').onclick = () => showAdminModal();
-  document.getElementById('closeAdminBtn').onclick = () => { setAdmin(false); showToast('🔧 Админ-панель отключена'); };
+  // Инвентарь
+  if (state) {
+    updateCrystalsDisplay();
+    renderInventory();
+  }
+  document.getElementById('openChestBtn').onclick = () => { if (state) openChest(); };
 
   if (state && !state.matchOver) saveState();
 
@@ -1075,159 +1211,7 @@ function setupSettingsUI() {
   }
 }
 
-// ==================== СЕКРЕТЫ АДМИНКИ ====================
-let titleTaps = 0;
-let titleTapTimer = null;
-
-function setupAdminSecret() {
-  const title = document.getElementById('settingsTitle');
-  if (title) {
-    title.addEventListener('click', () => {
-      titleTaps++;
-      clearTimeout(titleTapTimer);
-      titleTapTimer = setTimeout(() => { titleTaps = 0; }, 3000);
-      if (titleTaps >= 5) {
-        titleTaps = 0;
-        adminSecretUnlocked = true;
-        showToast('🔓 Секрет разблокирован! Нажми на «версия 1.0»', 'success');
-        const link = document.getElementById('versionLink');
-        if (link) { link.style.opacity = '1'; link.style.color = '#ffd93d'; link.style.fontWeight = 'bold'; link.textContent = 'версия 1.0 🔓'; }
-      }
-    });
-  }
-  const link = document.getElementById('versionLink');
-  if (link) {
-    link.addEventListener('click', () => {
-      if (adminActive) {
-        showModalConfirm('Админ-панель активна.\n\nОтключить?', () => {
-          setAdmin(false);
-          showToast('🔧 Админ-панель отключена');
-        });
-      } else if (adminSecretUnlocked) {
-        showAdminCodePrompt();
-      } else {
-        showToast('Сначала 5 раз тапни по названию игры');
-      }
-    });
-  }
-}
-
-function showAdminCodePrompt() {
-  const overlay = document.createElement('div');
-  overlay.className = 'confirm-overlay';
-  const card = document.createElement('div');
-  card.className = 'confirm-card';
-  card.innerHTML =
-    '<div style="font-size:15px;margin-bottom:14px;line-height:1.5;">🔒 Введите код доступа:</div>' +
-    '<input type="password" inputmode="numeric" id="adminCodeInput" placeholder="••••" ' +
-    'style="width:100%;padding:14px;font-size:22px;text-align:center;letter-spacing:8px;' +
-    'background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);' +
-    'border-radius:10px;color:white;outline:none;margin-bottom:14px;box-sizing:border-box;" maxlength="10">' +
-    '<div id="adminCodeError" style="color:#ff6b6b;font-size:12px;margin-bottom:8px;min-height:16px;"></div>' +
-    '<div class="confirm-btns"><button class="confirm-no">Отмена</button><button class="confirm-yes">Войти</button></div>';
-  overlay.appendChild(card);
-  document.body.appendChild(overlay);
-
-  const input = card.querySelector('#adminCodeInput');
-  const error = card.querySelector('#adminCodeError');
-  setTimeout(() => input.focus(), 100);
-
-  function trySubmit() {
-    if (input.value === '7777') {
-      overlay.remove();
-      adminCodeEntered = true;
-      const banner = document.getElementById('adminUnlockBanner');
-      if (banner) {
-        banner.style.display = 'block';
-        setTimeout(() => banner.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-      }
-      showToast('🔓 Код верный! Нажми «Использовать админ-панель»', 'success');
-    } else {
-      error.textContent = 'Неверный код';
-      input.value = '';
-      input.focus();
-    }
-  }
-  card.querySelector('.confirm-no').onclick = () => overlay.remove();
-  card.querySelector('.confirm-yes').onclick = trySubmit;
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') trySubmit(); });
-  input.addEventListener('input', () => { error.textContent = ''; });
-}
-
-// ==================== АДМИН-МОДАЛКА ====================
-function showAdminModal() {
-  if (!adminActive) { showToast('Нет доступа к админ-панели', 'error'); return; }
-  if (!state || !state.players) { showToast('Сначала начните или продолжите матч'); return; }
-  const list = document.getElementById('adminPlayersList');
-  let html = '';
-  state.players.forEach(p => {
-    const val = (state.adminForce && state.adminForce[p.id] != null) ? state.adminForce[p.id] : '';
-    html += '<div class="admin-player-row">' +
-      '<div class="admin-player-info">' + p.emoji + ' ' + escapeHTML(p.name) + '</div>' +
-      '<div class="admin-controls">' +
-      '<label style="font-size:11px;opacity:0.7;">Кубик:</label>' +
-      '<select data-aid="' + p.id + '">' +
-      '<option value="">По шансам</option>' +
-      [1,2,3,4,5,6].map(n => '<option value="' + n + '"' + (String(val) === String(n) ? ' selected' : '') + '>' + n + '</option>').join('') +
-      '</select>' +
-      '<label style="font-size:11px;opacity:0.7;margin-left:6px;">Поз:</label>' +
-      '<input type="number" data-apos="' + p.id + '" min="1" max="100" value="' + p.pos + '">' +
-      '<label style="font-size:11px;opacity:0.7;margin-left:6px;">Счёт:</label>' +
-      '<input type="number" data-ascore="' + p.id + '" min="0" max="99" value="' + p.score + '">' +
-      '</div>' +
-      '</div>';
-  });
-  list.innerHTML = html;
-
-  list.querySelectorAll('select').forEach(sel => {
-    sel.onchange = () => {
-      const id = parseInt(sel.dataset.aid, 10);
-      const v = sel.value;
-      if (!state.adminForce) state.adminForce = {};
-      if (v === '') delete state.adminForce[id];
-      else state.adminForce[id] = parseInt(v, 10);
-    };
-  });
-  list.querySelectorAll('[data-apos]').forEach(inp => {
-    inp.onchange = () => {
-      const id = parseInt(inp.dataset.apos, 10);
-      const v = Math.max(1, Math.min(100, parseInt(inp.value, 10) || 1));
-      const p = state.players.find(x => x.id === id);
-      if (p) { p.pos = v; placeTokens(); inp.value = v; }
-    };
-  });
-  list.querySelectorAll('[data-ascore]').forEach(inp => {
-    inp.onchange = () => {
-      const id = parseInt(inp.dataset.ascore, 10);
-      const v = Math.max(0, Math.min(99, parseInt(inp.value, 10) || 0));
-      const p = state.players.find(x => x.id === id);
-      if (p) { p.score = v; updateScores(); inp.value = v; }
-    };
-  });
-  document.getElementById('adminModal').style.display = 'flex';
-}
-
-document.getElementById('adminSkipTurnBtn').onclick = () => {
-  if (!state || !state.players) return;
-  addHistory('⏭ Админ: пропуск хода', 'round');
-  endTurn();
-  document.getElementById('adminModal').style.display = 'none';
-};
-
-// ==================== КНОПКА АКТИВАЦИИ ====================
-document.getElementById('activateAdminBtn').onclick = () => {
-  setAdmin(true);
-  adminCodeEntered = false;
-  adminSecretUnlocked = false;
-  document.getElementById('adminUnlockBanner').style.display = 'none';
-  const link = document.getElementById('versionLink');
-  if (link) { link.style.opacity = '0.35'; link.style.color = ''; link.style.fontWeight = ''; link.textContent = 'версия 1.0'; }
-  showToast('🔧 Админ-панель АКТИВИРОВАНА!', 'success');
-};
-
 // ==================== ИГРОВЫЕ КНОПКИ ====================
-document.getElementById('adminBtn').onclick = showAdminModal;
-
 document.getElementById('restartBtn').onclick = () => {
   if (!state) return;
   showModalConfirm('Начать новый матч?\n\nТекущий прогресс потеряется.', () => {
@@ -1299,10 +1283,7 @@ document.getElementById('winImageInput').onchange = e => {
 };
 
 // ==================== ИНИЦИАЛИЗАЦИЯ ====================
-try { if (localStorage.getItem('zmeyki_admin') === '1') adminActive = true; } catch {}
 setupSettingsUI();
-setupAdminSecret();
-updateAdminUI();
 showScreen('settings');
 
 if ('serviceWorker' in navigator) {
